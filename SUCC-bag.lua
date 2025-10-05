@@ -1,3 +1,5 @@
+local _G = getfenv(0)
+
 local function isSortingAddonLoaded()
 	return SortBags ~= nil and SortBankBags ~= nil or Clean_Up ~= nil
 end
@@ -964,22 +966,29 @@ local function CreateMenuFrame()
 		return k
 	end
 
-	local function slider(n, l, s, v, r, a)
-		local k = CreateFrame('Slider', n, menu, 'OptionsSliderTemplate')
-		k:SetWidth(90)
-		k:SetHeight(20)
-		if r then k:SetPoint(a and 'TOP' or 'LEFT', r, a and 'BOTTOM' or 'RIGHT', a and 0 or 20, a and -25 or 0) end
-		k:SetMinMaxValues(unpack(s))
-		k:SetValue(v[1])
-		k:SetValueStep(v[2])
-		getglobal(n .. 'Text'):SetText(l[1])
-		getglobal(n .. 'Low'):SetText(l[2])
-		getglobal(n .. 'High'):SetText(l[3])
-		return k
+	local function CreateSlider(name, text, minValue, maxValue, initValue, valueStep, relativePoint, anchorbelow)
+		local slider = CreateFrame('Slider', name, menu, 'OptionsSliderTemplate')
+		slider:SetWidth(90)
+		slider:SetHeight(20)
+		if relativePoint then
+			local point, relativepoint, x, y = 'LEFT', 'RIGHT', 40, 0
+			if anchorbelow then
+				point, relativepoint, x, y = 'TOP', 'BOTTOM', 0, -20
+			end
+			slider:SetPoint(point, relativePoint, relativepoint, x, y)
+		end
+		slider:SetMinMaxValues(minValue, maxValue)
+		slider:SetValue(initValue)
+		slider:SetValueStep(valueStep)
+		_G[name .. 'Text']:SetText(text)
+		_G[name .. 'Low']:SetText(minValue)
+		_G[name .. 'High']:SetText(maxValue)
+		return slider
 	end
 
 	menu = CreateFrame('Frame', 'SUCC_bagMenu', UIParent)
-	menu:SetWidth(270) menu:SetHeight(300)
+	menu:SetWidth(300)
+	menu:SetHeight(300)
 	menu:SetPoint('CENTER', UIParent)
 	menu:SetBackdrop(
 		{
@@ -1010,14 +1019,14 @@ local function CreateMenuFrame()
 	menu.bag = {}
 	menu.bank = {}
 
-	menu.bag.columns = slider('SBC_bagColumns', {'Bag Columns', '4', '32'}, {4, 32}, {SUCC_bagOptions.layout.columns.bag, 1})
+	menu.bag.columns = CreateSlider('SBC_bagColumns', 'Bag Columns', 4, 32, SUCC_bagOptions.layout.columns.bag, 1)
 	menu.bag.columns:SetPoint('TOPLEFT', menu, 35, -45)
 	menu.bag.columns:SetScript('OnValueChanged', SetColumns)
 
-	menu.bank.columns = slider('SBC_bankColumns', {'Bank Columns', '4', '32'}, {4, 32}, {SUCC_bagOptions.layout.columns.bank, 1}, menu.bag.columns)
+	menu.bank.columns = CreateSlider('SBC_bankColumns', 'Bank Columns', 4, 32, SUCC_bagOptions.layout.columns.bank, 1, menu.bag.columns)
 	menu.bank.columns:SetScript('OnValueChanged', SetColumns)
 
-	menu.spacing = slider('SBC_itemSpacing', {'Item spacing', '0', '20'}, {0, 20}, {SUCC_bagOptions.layout.spacing, 1}, menu.bag.columns, 1)
+	menu.spacing = CreateSlider('SBC_itemSpacing', 'Item spacing', 0, 20, SUCC_bagOptions.layout.spacing, 1, menu.bag.columns, 1)
 	menu.spacing:SetScript('OnValueChanged', function()
 		local l, n = this:GetValue(), string.sub(this:GetName(), 1, -8)
 		SUCC_bagOptions.layout.spacing = l
