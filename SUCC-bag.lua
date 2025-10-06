@@ -516,7 +516,7 @@ local function FrameUpdate(frame, bagID)
 			endSlot = GetKeyRingSize()
 			frameName = SUCC_bag.keyring:GetName()
 		else
-			if not frame.size --[[or RemoveBag(frame, bagID, GetContainerNumSlots(bagID))]] then return end
+			if not frame.size or RemoveBag(frame, bagID, GetContainerNumSlots(bagID)) then return end
 			for _, bag in pairs(frame.bags) do
 				if bag == bagID then
 					endSlot = startSlot + GetContainerNumSlots(bag) - 1
@@ -902,12 +902,14 @@ local function PrepareBank(frame)
 			GameTooltip:SetOwner(this, 'ANCHOR_RIGHT')
 			if not GameTooltip:SetInventoryItem('player', this:GetInventorySlot()) then
 				GameTooltip:SetText(this.tooltipText)
-				local cost = GetBankSlotCost(GetNumBankSlots())
-				SetTooltipMoney(GameTooltip, cost)
-				if GetMoney() >= cost then
-					SetMoneyFrameColor('GameTooltipMoneyFrame', 1, 1, 1)
-				else
-					SetMoneyFrameColor('GameTooltipMoneyFrame', 1, 0.1, 0.1)
+				if this:GetID() - 4 > GetNumBankSlots() then
+					local cost = GetBankSlotCost(GetNumBankSlots())
+					SetTooltipMoney(GameTooltip, cost)
+					if GetMoney() < cost then
+						SetMoneyFrameColor('GameTooltipMoneyFrame', 1, 0.1, 0.1)
+					else
+						SetMoneyFrameColor('GameTooltipMoneyFrame', 1, 1, 1)
+					end
 				end
 				GameTooltip:Show()
 			end
