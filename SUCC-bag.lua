@@ -497,6 +497,7 @@ local function FrameGenerate(frame)
 end
 
 local function RemoveBag(frame, bagID, bagSize)
+	if not frame:IsShown() then return end
 	if dummyBag[bagID] and dummyBag[bagID].size ~= bagSize then
 		FrameGenerate(frame)
 		return 1
