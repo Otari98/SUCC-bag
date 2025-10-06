@@ -252,7 +252,7 @@ local function TitleLayout(frame)
 		frame.title:ClearAllPoints()
 		frame.title:SetPoint('LEFT', frame.cuBag, 'RIGHT', 3, 0)
 		frame.cuBag:SetPoint('LEFT', frame.lockButton, 'RIGHT', 3, 0)
-		if not frame.cuBag:IsVisible() then frame.cuBag:Show() end
+		if not frame.cuBag:IsShown() then frame.cuBag:Show() end
 	else
 		if frame.cuBag then frame.cuBag:Hide() end
 		frame.title:ClearAllPoints()
@@ -658,7 +658,7 @@ local function SUCC_search()
 		searchBag(SUCC_bag.bank)
 		searchBag(SUCC_bag.keyring)
 
-		if not search.button:IsVisible() then
+		if not search.button:IsShown() then
 			search.button:Show()
 			search.icon:Show()
 		end
@@ -674,7 +674,7 @@ local function SUCC_search()
 		searchBag(SUCC_bag.bank)
 		searchBag(SUCC_bag.keyring)
 
-		if not search.button:IsVisible() then
+		if not search.button:IsShown() then
 			search.button:Show()
 			search.icon:Show()
 		end
@@ -747,7 +747,7 @@ local function Essentials(frame)
 				ToggleKeyRing()
 			else
 				PlaySound('igMainMenuOption')
-				if slotFrame:IsVisible() then
+				if slotFrame:IsShown() then
 					slotFrame:Hide()
 				else
 					slotFrame:Show()
@@ -949,12 +949,12 @@ local function OnEvent()
 			dummyBag.removed = arg1
 			dummyBag[arg1].size = 0
 			local parent = dummyBag[arg1]:GetParent()
-			if parent:IsVisible() then
+			if parent:IsShown() then
 				FrameGenerate(parent)
 			end
 		end
 	elseif event == 'ITEM_LOCK_CHANGED' then
-		if this:IsVisible() then
+		if this:IsShown() then
 			FrameUpdateLock(this)
 		end
 	elseif event == 'BANKFRAME_OPENED' then
@@ -1072,7 +1072,7 @@ SUCC_bag.keyring = CreateFrame('Frame', 'SUCC_bagKeyring', UIParent)
 -- SUCC_bag.keyring:SetPoint('BOTTOMRIGHT', UIParent, -55, 55)
 SUCC_bag.keyring.bags = {-2}
 SUCC_bag.keyring:SetScript('OnShow', function()
-	if SUCC_bag:IsVisible() then
+	if SUCC_bag:IsShown() then
 		this:ClearAllPoints()
 		this:SetPoint('BOTTOMLEFT', SUCC_bag, 'TOPLEFT', 0, 0)
 	end
@@ -1101,7 +1101,7 @@ function SBFrameClose(frame, automatic)
 end
 
 function SBFrameToggle(frame)
-	if frame:IsVisible() then
+	if frame:IsShown() then
 		SBFrameClose(frame)
 	else
 		SBFrameOpen(frame)
@@ -1202,9 +1202,9 @@ local function CreateMenuFrame()
 				color.enabled = not color.enabled
 				this:SetChecked(color.enabled)
 				PlayClickSound()
-				if SUCC_bag:IsVisible() then FrameUpdate(SUCC_bag) end
-				if SUCC_bag.bank:IsVisible() then FrameUpdate(SUCC_bag.bank) end
-				if SUCC_bag.keyring:IsVisible() then FrameUpdate(SUCC_bag.keyring) end
+				if SUCC_bag:IsShown() then FrameUpdate(SUCC_bag) end
+				if SUCC_bag.bank:IsShown() then FrameUpdate(SUCC_bag.bank) end
+				if SUCC_bag.keyring:IsShown() then FrameUpdate(SUCC_bag.keyring) end
 			end)
 		end
 		return button
@@ -1282,9 +1282,9 @@ local function CreateMenuFrame()
 	menu.spacing:SetScript('OnValueChanged', function()
 		local l, n = this:GetValue(), string.sub(this:GetName(), 1, -8)
 		SUCC_bagOptions.layout.spacing = l
-		if SUCC_bag:IsVisible() then FrameLayout(SUCC_bag) end
-		if SUCC_bag.bank:IsVisible() then FrameLayout(SUCC_bag.bank) end
-		if SUCC_bag.keyring:IsVisible() then FrameLayout(SUCC_bag.keyring) end
+		if SUCC_bag:IsShown() then FrameLayout(SUCC_bag) end
+		if SUCC_bag.bank:IsShown() then FrameLayout(SUCC_bag.bank) end
+		if SUCC_bag.keyring:IsShown() then FrameLayout(SUCC_bag.keyring) end
 	end)
 
 	menu.border = CreateColorButton('SBC_borderColor', L['Border'], SUCC_bagOptions.colors.border)
@@ -1317,9 +1317,9 @@ local function CreateMenuFrame()
 		SUCC_bagOptions.colors.bag[BAG][1] = r
 		SUCC_bagOptions.colors.bag[BAG][2] = g
 		SUCC_bagOptions.colors.bag[BAG][3] = b
-		if SUCC_bag:IsVisible() then FrameUpdate(SUCC_bag) end
-		if SUCC_bag.bank:IsVisible() then FrameUpdate(SUCC_bag.bank) end
-		if SUCC_bag.keyring:IsVisible() then FrameUpdate(SUCC_bag.keyring) end
+		if SUCC_bag:IsShown() then FrameUpdate(SUCC_bag) end
+		if SUCC_bag.bank:IsShown() then FrameUpdate(SUCC_bag.bank) end
+		if SUCC_bag.keyring:IsShown() then FrameUpdate(SUCC_bag.keyring) end
 	end
 
 	menu.quest = CreateColorButton('SBC_questColor', L['Quest item'], SUCC_bagOptions.colors.quest, menu.item, nil, 1)
@@ -1327,8 +1327,8 @@ local function CreateMenuFrame()
 		SUCC_bagOptions.colors.quest[1] = r
 		SUCC_bagOptions.colors.quest[2] = g
 		SUCC_bagOptions.colors.quest[3] = b
-		if SUCC_bag:IsVisible() then FrameUpdate(SUCC_bag) end
-		if SUCC_bag.bank:IsVisible() then FrameUpdate(SUCC_bag.bank) end
+		if SUCC_bag:IsShown() then FrameUpdate(SUCC_bag) end
+		if SUCC_bag.bank:IsShown() then FrameUpdate(SUCC_bag.bank) end
 	end
 
 	menu.highlight = CreateColorButton('SBC_highlightColor', L['Highlight'], SUCC_bagOptions.colors.highlight, menu.item, 1)
@@ -1336,8 +1336,8 @@ local function CreateMenuFrame()
 		SUCC_bagOptions.colors.highlight[1] = r
 		SUCC_bagOptions.colors.highlight[2] = g
 		SUCC_bagOptions.colors.highlight[3] = b
-		if SUCC_bag:IsVisible() then FrameUpdate(SUCC_bag) end
-		if SUCC_bag.bank:IsVisible() then FrameUpdate(SUCC_bag.bank) end
+		if SUCC_bag:IsShown() then FrameUpdate(SUCC_bag) end
+		if SUCC_bag.bank:IsShown() then FrameUpdate(SUCC_bag.bank) end
 	end
 
 	menu.bg = CreateColorButton('SBC_BGColor', L['BG marks'], SUCC_bagOptions.colors.BG, menu.highlight, nil, 1)
@@ -1345,8 +1345,8 @@ local function CreateMenuFrame()
 		SUCC_bagOptions.colors.BG[1] = r
 		SUCC_bagOptions.colors.BG[2] = g
 		SUCC_bagOptions.colors.BG[3] = b
-		if SUCC_bag:IsVisible() then FrameUpdate(SUCC_bag) end
-		if SUCC_bag.bank:IsVisible() then FrameUpdate(SUCC_bag.bank) end
+		if SUCC_bag:IsShown() then FrameUpdate(SUCC_bag) end
+		if SUCC_bag.bank:IsShown() then FrameUpdate(SUCC_bag.bank) end
 	end
 
 	menu.soul = CreateColorButton('SBC_soulColor', L['Soul bag'], SUCC_bagOptions.colors.bag[SOUL_BAG], menu.highlight, 1, 1)
@@ -1354,8 +1354,8 @@ local function CreateMenuFrame()
 		SUCC_bagOptions.colors.bag[SOUL_BAG][1] = r
 		SUCC_bagOptions.colors.bag[SOUL_BAG][2] = g
 		SUCC_bagOptions.colors.bag[SOUL_BAG][3] = b
-		if SUCC_bag:IsVisible() then FrameUpdate(SUCC_bag) end
-		if SUCC_bag.bank:IsVisible() then FrameUpdate(SUCC_bag.bank) end
+		if SUCC_bag:IsShown() then FrameUpdate(SUCC_bag) end
+		if SUCC_bag.bank:IsShown() then FrameUpdate(SUCC_bag.bank) end
 	end
 
 	menu.herb = CreateColorButton('SBC_herbColor', L['Herb bag'], SUCC_bagOptions.colors.bag[HERB_BAG], menu.soul, nil, 1)
@@ -1363,8 +1363,8 @@ local function CreateMenuFrame()
 		SUCC_bagOptions.colors.bag[HERB_BAG][1] = r
 		SUCC_bagOptions.colors.bag[HERB_BAG][2] = g
 		SUCC_bagOptions.colors.bag[HERB_BAG][3] = b
-		if SUCC_bag:IsVisible() then FrameUpdate(SUCC_bag) end
-		if SUCC_bag.bank:IsVisible() then FrameUpdate(SUCC_bag.bank) end
+		if SUCC_bag:IsShown() then FrameUpdate(SUCC_bag) end
+		if SUCC_bag.bank:IsShown() then FrameUpdate(SUCC_bag.bank) end
 	end
 
 	menu.enchanting = CreateColorButton('SBC_enchantingColor', L['Enchanting'], SUCC_bagOptions.colors.bag[ENCHANTING_BAG], menu.soul, 1, 1)
@@ -1372,8 +1372,8 @@ local function CreateMenuFrame()
 		SUCC_bagOptions.colors.bag[ENCHANTING_BAG][1] = r
 		SUCC_bagOptions.colors.bag[ENCHANTING_BAG][2] = g
 		SUCC_bagOptions.colors.bag[ENCHANTING_BAG][3] = b
-		if SUCC_bag:IsVisible() then FrameUpdate(SUCC_bag) end
-		if SUCC_bag.bank:IsVisible() then FrameUpdate(SUCC_bag.bank) end
+		if SUCC_bag:IsShown() then FrameUpdate(SUCC_bag) end
+		if SUCC_bag.bank:IsShown() then FrameUpdate(SUCC_bag.bank) end
 	end
 
 	menu.ammo = CreateColorButton('SBC_ammoColor', L['Ammo bag'], SUCC_bagOptions.colors.ammo, menu.enchanting, nil, 1)
@@ -1381,8 +1381,8 @@ local function CreateMenuFrame()
 		SUCC_bagOptions.colors.ammo[1] = r
 		SUCC_bagOptions.colors.ammo[2] = g
 		SUCC_bagOptions.colors.ammo[3] = b
-		if SUCC_bag:IsVisible() then FrameUpdate(SUCC_bag) end
-		if SUCC_bag.bank:IsVisible() then FrameUpdate(SUCC_bag.bank) end
+		if SUCC_bag:IsShown() then FrameUpdate(SUCC_bag) end
+		if SUCC_bag.bank:IsShown() then FrameUpdate(SUCC_bag.bank) end
 	end
 
 	menu.override = CreateFrame('CheckButton', 'SBC_ColorBagOverride', menu, 'UICheckButtonTemplate')
@@ -1396,8 +1396,8 @@ local function CreateMenuFrame()
 		else
 			SUCC_bagOptions.colors.override = false
 		end
-		if SUCC_bag:IsVisible() then FrameUpdate(SUCC_bag) end
-		if SUCC_bag.bank:IsVisible() then FrameUpdate(SUCC_bag.bank) end
+		if SUCC_bag:IsShown() then FrameUpdate(SUCC_bag) end
+		if SUCC_bag.bank:IsShown() then FrameUpdate(SUCC_bag.bank) end
 	end)
 	menu.override.t = menu.override:CreateFontString(nil, 'OVERLAY', 'GameFontNormal')
 	menu.override.t:SetPoint('RIGHT', menu.override, 'LEFT', 10, 0)
@@ -1436,9 +1436,9 @@ local function CreateMenuFrame()
 		menu.bag.columns:SetValue(SUCC_bagOptions.layout.columns.bag)
 		menu.bank.columns:SetValue(SUCC_bagOptions.layout.columns.bank)
 		menu.spacing:SetValue(SUCC_bagOptions.layout.spacing)
-		if SUCC_bag:IsVisible() then FrameGenerate(SUCC_bag) end
-		if SUCC_bag.bank:IsVisible() then FrameGenerate(SUCC_bag.bank) end
-		if SUCC_bag.keyring:IsVisible() then FrameGenerate(SUCC_bag.keyring) end
+		if SUCC_bag:IsShown() then FrameGenerate(SUCC_bag) end
+		if SUCC_bag.bank:IsShown() then FrameGenerate(SUCC_bag.bank) end
+		if SUCC_bag.keyring:IsShown() then FrameGenerate(SUCC_bag.keyring) end
 	end)
 
 	menu.close = CreateFrame('Button', nil, menu, 'UIPanelButtonTemplate')
