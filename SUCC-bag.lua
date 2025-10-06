@@ -22,17 +22,17 @@ end
 local function SUCC_bagDefaults()
 	SUCC_bagOptions = {}
 	SUCC_bagOptions.colors = {}
-	SUCC_bagOptions.colors.highlight = {1, 0.2, 0.2 }
-	SUCC_bagOptions.colors.quest = {0.96, 0.64, 0.94}
-	SUCC_bagOptions.colors.ammo = {0.8, 0.8, 0.3}
-	SUCC_bagOptions.colors.BG = {0.98, 0.95, 0}
+	SUCC_bagOptions.colors.highlight = {1, 0.2, 0.2}
+	SUCC_bagOptions.colors.quest = {0.96, 0.64, 0.94, enabled = true}
+	SUCC_bagOptions.colors.ammo = {0.8, 0.8, 0.3, enabled = true}
+	SUCC_bagOptions.colors.BG = {0.98, 0.95, 0, enabled = true}
 	SUCC_bagOptions.colors.border = {1, 1, 1}
 	SUCC_bagOptions.colors.backdrop = {0.3, 0.3, 0.3}
 	SUCC_bagOptions.colors.bag = {}
 	SUCC_bagOptions.colors.bag['Bag'] = {0.3, 0.3, 0.3}
-	SUCC_bagOptions.colors.bag['Soul Bag'] = {0.678, 0.549, 1}
-	SUCC_bagOptions.colors.bag['Herb Bag'] = {0.3, 0.8, 0.3}
-	SUCC_bagOptions.colors.bag['Enchanting Bag'] = {0.5, 0.4, 0.8}
+	SUCC_bagOptions.colors.bag['Soul Bag'] = {0.678, 0.549, 1, enabled = true}
+	SUCC_bagOptions.colors.bag['Herb Bag'] = {0.3, 0.8, 0.3, enabled = true}
+	SUCC_bagOptions.colors.bag['Enchanting Bag'] = {0.5, 0.4, 0.8, enabled = true}
 	SUCC_bagOptions.colors.override = false
 	SUCC_bagOptions.layout = {}
 	SUCC_bagOptions.layout.spacing = 4
@@ -48,9 +48,9 @@ local function SUCC_bagDefaults()
 end
 
 -- debug
-local function print(mes)
-	DEFAULT_CHAT_FRAME:AddMessage(mes)
-end
+-- local function print(mes)
+-- 	DEFAULT_CHAT_FRAME:AddMessage(mes)
+-- end
 
 local function	moneyToString(money)
 	local coins = {}
@@ -186,10 +186,10 @@ local function FrameLayout(frame, cols)
 	FrameTrimToSize(frame)
 end
 
-local function BagType (bagID)
+local function GetBagColorInfo(bagID)
 	if bagID > 0 then
 		local link = GetInventoryItemLink('player', ContainerIDToInventoryID(bagID))
-		if(link) then
+		if link then
 			local _, _, id = string.find(link, "item:(%d+)")
 			local _, _, _, _, itemType, subType = GetItemInfo(id)
 			if itemType == 'Quiver' then
@@ -207,16 +207,16 @@ local function ItemUpdateBorder(button, option)
 		button:GetNormalTexture():SetVertexColor(unpack(SUCC_bagOptions.colors.highlight))
 	elseif not button:GetParent().colorLocked then
 		local bagID = button:GetParent():GetID()
-		local v, c = BagType(bagID)
-		if c or SUCC_bagOptions.colors.override then
+		local bagColorInfo, isRegularBag = GetBagColorInfo(bagID)
+		if isRegularBag or SUCC_bagOptions.colors.override or not bagColorInfo.enabled then
 			local link = GetContainerItemLink(bagID, button:GetID())
 			if link then
 				local _, _, id = string.find(link, "item:(%d+)")
 				local n, _, q, _, _, t = GetItemInfo(id)
-				if n ~= nil and string.find(n, 'Mark of Honor') then
+				if n ~= nil and string.find(n, 'Mark of Honor') and SUCC_bagOptions.colors.BG.enabled then
 					button:GetNormalTexture():SetVertexColor(unpack(SUCC_bagOptions.colors.BG))
 					return
-				elseif t == 'Quest' then
+				elseif t == 'Quest' and SUCC_bagOptions.colors.quest.enabled then
 					button:GetNormalTexture():SetVertexColor(unpack(SUCC_bagOptions.colors.quest))
 					return
 				elseif q ~= nil and q > 1 then
@@ -225,7 +225,11 @@ local function ItemUpdateBorder(button, option)
 				end
 			end
 		end
-		button:GetNormalTexture():SetVertexColor(unpack(v))
+		if bagColorInfo.enabled == nil or bagColorInfo.enabled then
+			button:GetNormalTexture():SetVertexColor(unpack(bagColorInfo))
+		else
+			button:GetNormalTexture():SetVertexColor(unpack(SUCC_bagOptions.colors.bag['Bag']))
+		end
 	end
 end
 
@@ -767,6 +771,15 @@ local function OnEvent()
 		BankUpdateBagSlotStatus()
 	elseif event == 'ADDON_LOADED' and arg1 == 'SUCC-bag' then
 		SUCC_bagOptions = SUCC_bagOptions or SUCC_bagDefaults()
+		if SUCC_bagOptions.colors.bag['Bag'].enabled == nil then
+			SUCC_bagOptions.colors.quest.enabled = true
+			SUCC_bagOptions.colors.ammo.enabled = true
+			SUCC_bagOptions.colors.BG.enabled = true
+			SUCC_bagOptions.colors.bag['Bag'].enabled = true
+			SUCC_bagOptions.colors.bag['Soul Bag'].enabled = true
+			SUCC_bagOptions.colors.bag['Herb Bag'].enabled = true
+			SUCC_bagOptions.colors.bag['Enchanting Bag'].enabled = true
+		end
 		this:UnregisterEvent('ADDON_LOADED')
 		BankFrame:UnregisterEvent('BANKFRAME_OPENED')
 		this:RegisterEvent('BAG_CLOSED')
@@ -948,22 +961,43 @@ local function ColorPicker(frame, reset)
 end
 
 local function CreateMenuFrame()
-	local function color(n, l, c, r, a)
-		local k = CreateFrame('Button', n, menu)
-		k:SetWidth(90)
-		k:SetHeight(16)
-		if r then k:SetPoint(a and 'TOP' or 'LEFT', r, a and 'BOTTOM' or 'RIGHT', a and 0 or 20, 0) end
-		k.t = k:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
-		k.t:SetPoint('Left', k)
-		k.t:SetText(l .. ':')
-		k.swatch = k:CreateTexture(k:GetName() .. 'SwatchBg', 'BACKGROUND')
-		k.swatch:SetTexture('Interface\\ChatFrame\\ChatFrameColorSwatch')
-		k.swatch:SetPoint('RIGHT', k)
-		k.swatch:SetWidth(16)
-		k.swatch:SetHeight(16)
-		k.swatch:SetVertexColor(unpack(c))
-		k:SetScript('OnClick', function() ColorPicker(this, c) end)
-		return k
+	local function CreateColorButton(name, text, color, relativeto, anchorbelow, hascheckbox)
+		local button = CreateFrame('Button', name, menu)
+		button:SetWidth(90)
+		button:SetHeight(16)
+		if relativeto then
+			local point, relativepoint, x, y = 'LEFT', 'RIGHT', 40, 0
+			if anchorbelow then
+				point, relativepoint, x, y = 'TOP', 'BOTTOM', 0, 0
+			end
+			button:SetPoint(point, relativeto, relativepoint, x, y)
+		end
+		button.text = button:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
+		button.text:SetPoint('Left', button)
+		button.text:SetText(text .. ':')
+		button.swatch = button:CreateTexture(button:GetName() .. 'SwatchBg', 'BACKGROUND')
+		button.swatch:SetTexture('Interface\\ChatFrame\\ChatFrameColorSwatch')
+		button.swatch:SetPoint('RIGHT', button)
+		button.swatch:SetWidth(16)
+		button.swatch:SetHeight(16)
+		button.swatch:SetVertexColor(unpack(color))
+		button:SetScript('OnClick', function() ColorPicker(this, color) end)
+		if hascheckbox then
+			button.enable = CreateFrame('CheckButton', name.."Enabled", button, "UICheckButtonTemplate")
+			button.enable:SetPoint('LEFT', button, 'RIGHT', 0, 0)
+			button.enable:SetWidth(18)
+			button.enable:SetHeight(18)
+			button.enable:SetScript('OnShow', function() this:SetChecked(color.enabled) end)
+			button.enable:SetScript('OnClick', function()
+				color.enabled = not color.enabled
+				this:SetChecked(color.enabled)
+				PlayClickSound()
+				if SUCC_bag:IsVisible() then FrameUpdate(SUCC_bag) end
+				if SUCC_bag.bank:IsVisible() then FrameUpdate(SUCC_bag.bank) end
+				if SUCC_bag.keyring:IsVisible() then FrameUpdate(SUCC_bag.keyring) end
+			end)
+		end
+		return button
 	end
 
 	local function CreateSlider(name, text, minValue, maxValue, initValue, valueStep, relativePoint, anchorbelow)
@@ -1035,10 +1069,12 @@ local function CreateMenuFrame()
 		if SUCC_bag.keyring:IsVisible() then FrameLayout(SUCC_bag.keyring) end
 	end)
 
-	menu.border = color('SBC_borderColor', 'Border', SUCC_bagOptions.colors.border)
+	menu.border = CreateColorButton('SBC_borderColor', 'Border', SUCC_bagOptions.colors.border)
 	menu.border:SetPoint('TOP', menu.spacing, 'BOTTOM', 0, -25)
 	menu.border.func = function(r, g, b)
-		SUCC_bagOptions.colors.border = {r, g, b}
+		SUCC_bagOptions.colors.border[1] = r
+		SUCC_bagOptions.colors.border[2] = g
+		SUCC_bagOptions.colors.border[3] = b
 		SUCC_bag:SetBackdropBorderColor(r, g, b)
 		SUCC_bag.bank:SetBackdropBorderColor(r, g, b)
 		SUCC_bag.keyring:SetBackdropBorderColor(r, g, b)
@@ -1046,9 +1082,11 @@ local function CreateMenuFrame()
 		SUCC_bag.bank.slotFrame:SetBackdropBorderColor(r, g, b)
 	end
 
-	menu.backdrop  = color('SBC_backdropColor', 'Backdrop', SUCC_bagOptions.colors.backdrop, menu.border)
+	menu.backdrop  = CreateColorButton('SBC_backdropColor', 'Backdrop', SUCC_bagOptions.colors.backdrop, menu.border)
 	menu.backdrop.func = function(r, g, b)
-		SUCC_bagOptions.colors.backdrop = {r, g, b}
+		SUCC_bagOptions.colors.backdrop[1] = r
+		SUCC_bagOptions.colors.backdrop[2] = g
+		SUCC_bagOptions.colors.backdrop[3] = b
 		SUCC_bag:SetBackdropColor(r, g, b)
 		SUCC_bag.bank:SetBackdropColor(r, g, b)
 		SUCC_bag.keyring:SetBackdropColor(r, g, b)
@@ -1056,59 +1094,75 @@ local function CreateMenuFrame()
 		SUCC_bag.bank.slotFrame:SetBackdropColor(r, g, b)
 	end
 
-	menu.item = color('SBC_itemColor', 'Item border', SUCC_bagOptions.colors.bag.Bag, menu.border, 1)
+	menu.item = CreateColorButton('SBC_itemColor', 'Regular bag', SUCC_bagOptions.colors.bag.Bag, menu.border, 1)
 	menu.item.func = function(r, g, b)
-		SUCC_bagOptions.colors.bag.Bag = {r, g, b}
+		SUCC_bagOptions.colors.bag.Bag[1] = r
+		SUCC_bagOptions.colors.bag.Bag[2] = g
+		SUCC_bagOptions.colors.bag.Bag[3] = b
 		if SUCC_bag:IsVisible() then FrameUpdate(SUCC_bag) end
 		if SUCC_bag.bank:IsVisible() then FrameUpdate(SUCC_bag.bank) end
 		if SUCC_bag.keyring:IsVisible() then FrameUpdate(SUCC_bag.keyring) end
 	end
 
-	menu.quest = color('SBC_questColor', 'Quest item', SUCC_bagOptions.colors.quest, menu.item)
+	menu.quest = CreateColorButton('SBC_questColor', 'Quest item', SUCC_bagOptions.colors.quest, menu.item, nil, 1)
 	menu.quest.func = function(r, g, b)
-		SUCC_bagOptions.colors.quest = {r, g, b}
+		SUCC_bagOptions.colors.quest[1] = r
+		SUCC_bagOptions.colors.quest[2] = g
+		SUCC_bagOptions.colors.quest[3] = b
 		if SUCC_bag:IsVisible() then FrameUpdate(SUCC_bag) end
 		if SUCC_bag.bank:IsVisible() then FrameUpdate(SUCC_bag.bank) end
 	end
 
-	menu.highlight = color('SBC_highlightColor', 'Highlight', SUCC_bagOptions.colors.highlight, menu.item, 1)
+	menu.highlight = CreateColorButton('SBC_highlightColor', 'Highlight', SUCC_bagOptions.colors.highlight, menu.item, 1)
 	menu.highlight.func = function(r, g, b)
-		SUCC_bagOptions.colors.highlight = {r, g, b}
+		SUCC_bagOptions.colors.highlight[1] = r
+		SUCC_bagOptions.colors.highlight[2] = g
+		SUCC_bagOptions.colors.highlight[3] = b
 		if SUCC_bag:IsVisible() then FrameUpdate(SUCC_bag) end
 		if SUCC_bag.bank:IsVisible() then FrameUpdate(SUCC_bag.bank) end
 	end
 
-	menu.bg = color('SBC_BGColor', 'BG marks', SUCC_bagOptions.colors.BG, menu.highlight)
+	menu.bg = CreateColorButton('SBC_BGColor', 'BG marks', SUCC_bagOptions.colors.BG, menu.highlight, nil, 1)
 	menu.bg.func = function(r, g, b)
-		SUCC_bagOptions.colors.BG = {r, g, b}
+		SUCC_bagOptions.colors.BG[1] = r
+		SUCC_bagOptions.colors.BG[2] = g
+		SUCC_bagOptions.colors.BG[3] = b
 		if SUCC_bag:IsVisible() then FrameUpdate(SUCC_bag) end
 		if SUCC_bag.bank:IsVisible() then FrameUpdate(SUCC_bag.bank) end
 	end
 
-	menu.soul = color('SBC_soulColor', 'Soul bag', SUCC_bagOptions.colors.bag['Soul Bag'], menu.highlight, 1)
+	menu.soul = CreateColorButton('SBC_soulColor', 'Soul bag', SUCC_bagOptions.colors.bag['Soul Bag'], menu.highlight, 1, 1)
 	menu.soul.func = function(r, g, b)
-		SUCC_bagOptions.colors.bag['Soul Bag'] = {r, g, b}
+		SUCC_bagOptions.colors.bag['Soul Bag'][1] = r
+		SUCC_bagOptions.colors.bag['Soul Bag'][2] = g
+		SUCC_bagOptions.colors.bag['Soul Bag'][3] = b
 		if SUCC_bag:IsVisible() then FrameUpdate(SUCC_bag) end
 		if SUCC_bag.bank:IsVisible() then FrameUpdate(SUCC_bag.bank) end
 	end
 
-	menu.herb = color('SBC_herbColor', 'Herb bag', SUCC_bagOptions.colors.bag['Herb Bag'], menu.soul)
+	menu.herb = CreateColorButton('SBC_herbColor', 'Herb bag', SUCC_bagOptions.colors.bag['Herb Bag'], menu.soul, nil, 1)
 	menu.herb.func = function(r, g, b)
-		SUCC_bagOptions.colors.bag['Herb Bag'] = {r, g, b}
+		SUCC_bagOptions.colors.bag['Herb Bag'][1] = r
+		SUCC_bagOptions.colors.bag['Herb Bag'][2] = g
+		SUCC_bagOptions.colors.bag['Herb Bag'][3] = b
 		if SUCC_bag:IsVisible() then FrameUpdate(SUCC_bag) end
 		if SUCC_bag.bank:IsVisible() then FrameUpdate(SUCC_bag.bank) end
 	end
 
-	menu.enchanting = color('SBC_enchantingColor', 'Enchanting', SUCC_bagOptions.colors.bag['Enchanting Bag'], menu.soul, 1)
+	menu.enchanting = CreateColorButton('SBC_enchantingColor', 'Enchanting', SUCC_bagOptions.colors.bag['Enchanting Bag'], menu.soul, 1, 1)
 	menu.enchanting.func = function(r, g, b)
-		SUCC_bagOptions.colors.bag['Enchanting Bag'] = {r, g, b}
+		SUCC_bagOptions.colors.bag['Enchanting Bag'][1] = r
+		SUCC_bagOptions.colors.bag['Enchanting Bag'][2] = g
+		SUCC_bagOptions.colors.bag['Enchanting Bag'][3] = b
 		if SUCC_bag:IsVisible() then FrameUpdate(SUCC_bag) end
 		if SUCC_bag.bank:IsVisible() then FrameUpdate(SUCC_bag.bank) end
 	end
 
-	menu.ammo = color('SBC_ammoColor', 'Ammo bag', SUCC_bagOptions.colors.ammo, menu.enchanting)
+	menu.ammo = CreateColorButton('SBC_ammoColor', 'Ammo bag', SUCC_bagOptions.colors.ammo, menu.enchanting, nil, 1)
 	menu.ammo.func = function(r, g, b)
-		SUCC_bagOptions.colors.ammo = {r, g, b}
+		SUCC_bagOptions.colors.ammo[1] = r
+		SUCC_bagOptions.colors.ammo[2] = g
+		SUCC_bagOptions.colors.ammo[3] = b
 		if SUCC_bag:IsVisible() then FrameUpdate(SUCC_bag) end
 		if SUCC_bag.bank:IsVisible() then FrameUpdate(SUCC_bag.bank) end
 	end
