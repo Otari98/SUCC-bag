@@ -1,5 +1,156 @@
 local _G = getfenv(0)
 
+local weapon, armor, container, consumable, tradeGoods, projectile, QUIVER, recipe, reagent, miscellaneous =  GetAuctionItemClasses(1)
+local BAG, SOUL_BAG, HERB_BAG, ENCHANTING_BAG = GetAuctionItemSubClasses(3)
+
+local L = {
+	['Sort button'] = 'Sort button',
+	['Quality color above bag color'] = 'Quality color above bag color',
+	['Ammo bag'] = 'Ammo bag',
+	['Enchanting'] = 'Enchanting',
+	['Herb bag'] = 'Herb bag',
+	['Soul bag'] = 'Soul bag',
+	['BG marks'] = 'BG marks',
+	['Highlight'] = 'Highlight',
+	['Quest item'] = 'Quest item',
+	['Regular bag'] = 'Regular bag',
+	['Backdrop'] = 'Backdrop',
+	['Border'] = 'Border',
+	['Item spacing'] = 'Item spacing',
+	['Bank Columns'] = 'Bank Columns',
+	['Bag Columns'] = 'Bag Columns',
+	['SUCC-bag options'] = 'SUCC-bag options',
+	['Right Click: Reverse order'] = 'Right Click: Reverse order',
+	['Left Click: Sort'] = 'Left Click: Sort',
+	['Left Click: Unlock this frame'] = 'Left Click: Unlock this frame',
+	['Left Click: Lock this frame'] = 'Left Click: Lock this frame',
+	['Right Click: Options'] = 'Right Click: Options',
+	['Quest'] = 'Quest',
+	['Mark of Honor'] = 'Mark of Honor',
+}
+
+if GetLocale() == 'zhCN' then
+	-- L['Sort button'] = ''
+	-- L['Quality color above bag color'] = ''
+	-- L['Ammo bag'] = ''
+	-- L['Enchanting'] = ''
+	-- L['Herb bag'] = ''
+	-- L['Soul bag'] = ''
+	-- L['BG marks'] = ''
+	-- L['Highlight'] = ''
+	-- L['Quest item'] = ''
+	-- L['Regular bag'] = ''
+	-- L['Backdrop'] = ''
+	-- L['Border'] = ''
+	-- L['Item spacing'] = ''
+	-- L['Bank Columns'] = ''
+	-- L['Bag Columns'] = ''
+	-- L['SUCC-bag options'] = ''
+	-- L['Right Click: Reverse order'] = ''
+	-- L['Left Click: Sort'] = ''
+	-- L['Left Click: Unlock this frame'] = ''
+	-- L['Left Click: Lock this frame'] = ''
+	-- L['Right Click: Options'] = '',
+	-- L['Quest'] = ''
+	-- L['Mark of Honor'] = '',
+elseif GetLocale() == 'deDE' then
+	-- L['Sort button'] = ''
+	-- L['Quality color above bag color'] = ''
+	-- L['Ammo bag'] = ''
+	-- L['Enchanting'] = ''
+	-- L['Herb bag'] = ''
+	-- L['Soul bag'] = ''
+	-- L['BG marks'] = ''
+	-- L['Highlight'] = ''
+	-- L['Quest item'] = ''
+	-- L['Regular bag'] = ''
+	-- L['Backdrop'] = ''
+	-- L['Border'] = ''
+	-- L['Item spacing'] = ''
+	-- L['Bank Columns'] = ''
+	-- L['Bag Columns'] = ''
+	-- L['SUCC-bag options'] = ''
+	-- L['Right Click: Reverse order'] = ''
+	-- L['Left Click: Sort'] = ''
+	-- L['Left Click: Unlock this frame'] = ''
+	-- L['Left Click: Lock this frame'] = ''
+	-- L['Right Click: Options'] = '',
+	-- L['Quest'] = ''
+	-- L['Mark of Honor'] = '',
+elseif GetLocale() == 'esES' then
+	-- L['Sort button'] = ''
+	-- L['Quality color above bag color'] = ''
+	-- L['Ammo bag'] = ''
+	-- L['Enchanting'] = ''
+	-- L['Herb bag'] = ''
+	-- L['Soul bag'] = ''
+	-- L['BG marks'] = ''
+	-- L['Highlight'] = ''
+	-- L['Quest item'] = ''
+	-- L['Regular bag'] = ''
+	-- L['Backdrop'] = ''
+	-- L['Border'] = ''
+	-- L['Item spacing'] = ''
+	-- L['Bank Columns'] = ''
+	-- L['Bag Columns'] = ''
+	-- L['SUCC-bag options'] = ''
+	-- L['Right Click: Reverse order'] = ''
+	-- L['Left Click: Sort'] = ''
+	-- L['Left Click: Unlock this frame'] = ''
+	-- L['Left Click: Lock this frame'] = ''
+	-- L['Right Click: Options'] = '',
+	-- L['Quest'] = ''
+	-- L['Mark of Honor'] = '',
+elseif GetLocale() == 'ptBR' then
+	-- L['Sort button'] = ''
+	-- L['Quality color above bag color'] = ''
+	-- L['Ammo bag'] = ''
+	-- L['Enchanting'] = ''
+	-- L['Herb bag'] = ''
+	-- L['Soul bag'] = ''
+	-- L['BG marks'] = ''
+	-- L['Highlight'] = ''
+	-- L['Quest item'] = ''
+	-- L['Regular bag'] = ''
+	-- L['Backdrop'] = ''
+	-- L['Border'] = ''
+	-- L['Item spacing'] = ''
+	-- L['Bank Columns'] = ''
+	-- L['Bag Columns'] = ''
+	-- L['SUCC-bag options'] = ''
+	-- L['Right Click: Reverse order'] = ''
+	-- L['Left Click: Sort'] = ''
+	-- L['Left Click: Unlock this frame'] = ''
+	-- L['Left Click: Lock this frame'] = ''
+	-- L['Right Click: Options'] = '',
+	-- L['Quest'] = ''
+	-- L['Mark of Honor'] = '',
+elseif GetLocale() == 'ruRU' then
+	-- L['Sort button'] = ''
+	-- L['Quality color above bag color'] = ''
+	-- L['Ammo bag'] = ''
+	-- L['Enchanting'] = ''
+	-- L['Herb bag'] = ''
+	-- L['Soul bag'] = ''
+	-- L['BG marks'] = ''
+	-- L['Highlight'] = ''
+	-- L['Quest item'] = ''
+	-- L['Regular bag'] = ''
+	-- L['Backdrop'] = ''
+	-- L['Border'] = ''
+	-- L['Item spacing'] = ''
+	-- L['Bank Columns'] = ''
+	-- L['Bag Columns'] = ''
+	-- L['SUCC-bag options'] = ''
+	-- L['Right Click: Reverse order'] = ''
+	-- L['Left Click: Sort'] = ''
+	-- L['Left Click: Unlock this frame'] = ''
+	-- L['Left Click: Lock this frame'] = ''
+	-- L['Right Click: Options'] = '',
+	-- L['Quest'] = ''
+	-- L['Mark of Honor'] = '',
+end
+
 local function isSortingAddonLoaded()
 	return SortBags ~= nil and SortBankBags ~= nil or Clean_Up ~= nil
 end
@@ -8,9 +159,9 @@ local function sortItems(where, reversed)
 	if SortBags ~= nil and SortBankBags ~= nil then
 		local oldReversed = GetSortBagsRightToLeft()
 		SetSortBagsRightToLeft(reversed)
-		if where == "bags" then
+		if where == 'bags' then
 			SortBags()
-		elseif where == "bank" then
+		elseif where == 'bank' then
 			SortBankBags()
 		end
 		SetSortBagsRightToLeft(oldReversed)
@@ -29,10 +180,10 @@ local function SUCC_bagDefaults()
 	SUCC_bagOptions.colors.ammo = {0.8, 0.8, 0.3, enabled = true}
 	SUCC_bagOptions.colors.BG = {0.98, 0.95, 0, enabled = true}
 	SUCC_bagOptions.colors.bag = {}
-	SUCC_bagOptions.colors.bag['Bag'] = {0.3, 0.3, 0.3}
-	SUCC_bagOptions.colors.bag['Soul Bag'] = {0.678, 0.549, 1, enabled = true}
-	SUCC_bagOptions.colors.bag['Herb Bag'] = {0.3, 0.8, 0.3, enabled = true}
-	SUCC_bagOptions.colors.bag['Enchanting Bag'] = {0.5, 0.4, 0.8, enabled = true}
+	SUCC_bagOptions.colors.bag[BAG] = {0.3, 0.3, 0.3}
+	SUCC_bagOptions.colors.bag[SOUL_BAG] = {0.678, 0.549, 1, enabled = true}
+	SUCC_bagOptions.colors.bag[HERB_BAG] = {0.3, 0.8, 0.3, enabled = true}
+	SUCC_bagOptions.colors.bag[ENCHANTING_BAG] = {0.5, 0.4, 0.8, enabled = true}
 	SUCC_bagOptions.colors.override = false
 	SUCC_bagOptions.layout = {}
 	SUCC_bagOptions.layout.spacing = 4
@@ -41,9 +192,9 @@ local function SUCC_bagDefaults()
 	SUCC_bagOptions.layout.columns.bank = 11
 	SUCC_bagOptions.Clean_Up = 1
 	SUCC_bagOptions.position = {}
-	SUCC_bagOptions.position["SUCC_bag"] = {1000.0, 380.0, locked = false}
-	SUCC_bagOptions.position["SUCC_bagBank"] = {640.0, 440.0, locked = false}
-	SUCC_bagOptions.position["SUCC_bagKeyring"] = {760.0, 740.0, locked = false}
+	SUCC_bagOptions.position['SUCC_bag'] = {1000.0, 380.0, locked = false}
+	SUCC_bagOptions.position['SUCC_bagBank'] = {640.0, 440.0, locked = false}
+	SUCC_bagOptions.position['SUCC_bagKeyring'] = {760.0, 740.0, locked = false}
 	return SUCC_bagOptions
 end
 
@@ -190,16 +341,16 @@ local function GetBagColorInfo(bagID)
 	if bagID > 0 then
 		local link = GetInventoryItemLink('player', ContainerIDToInventoryID(bagID))
 		if link then
-			local _, _, id = string.find(link, "item:(%d+)")
+			local _, _, id = string.find(link, 'item:(%d+)')
 			local _, _, _, _, itemType, subType = GetItemInfo(id)
-			if itemType == 'Quiver' then
+			if itemType == QUIVER then
 				return SUCC_bagOptions.colors.ammo
 			else
-				return SUCC_bagOptions.colors.bag[subType], subType == 'Bag'
+				return SUCC_bagOptions.colors.bag[subType], subType == BAG
 			end
 		end
 	end
-	return SUCC_bagOptions.colors.bag.Bag, true
+	return SUCC_bagOptions.colors.bag[BAG], true
 end
 
 local function ItemUpdateBorder(button, option)
@@ -211,12 +362,12 @@ local function ItemUpdateBorder(button, option)
 		if isRegularBag or SUCC_bagOptions.colors.override or not bagColorInfo.enabled then
 			local link = GetContainerItemLink(bagID, button:GetID())
 			if link then
-				local _, _, id = string.find(link, "item:(%d+)")
+				local _, _, id = string.find(link, 'item:(%d+)')
 				local n, _, q, _, _, t = GetItemInfo(id)
-				if n ~= nil and string.find(n, 'Mark of Honor') and SUCC_bagOptions.colors.BG.enabled then
+				if n ~= nil and string.find(n, L['Mark of Honor']) and SUCC_bagOptions.colors.BG.enabled then
 					button:GetNormalTexture():SetVertexColor(unpack(SUCC_bagOptions.colors.BG))
 					return
-				elseif t == 'Quest' and SUCC_bagOptions.colors.quest.enabled then
+				elseif t == L['Quest'] and SUCC_bagOptions.colors.quest.enabled then
 					button:GetNormalTexture():SetVertexColor(unpack(SUCC_bagOptions.colors.quest))
 					return
 				elseif q ~= nil and q > 1 then
@@ -228,7 +379,7 @@ local function ItemUpdateBorder(button, option)
 		if bagColorInfo.enabled == nil or bagColorInfo.enabled then
 			button:GetNormalTexture():SetVertexColor(unpack(bagColorInfo))
 		else
-			button:GetNormalTexture():SetVertexColor(unpack(SUCC_bagOptions.colors.bag['Bag']))
+			button:GetNormalTexture():SetVertexColor(unpack(SUCC_bagOptions.colors.bag[BAG]))
 		end
 	end
 end
@@ -263,7 +414,7 @@ local function ItemUpdate(item)
 		if texture then
 			local hasCooldown, repairCost = GameTooltip:SetBagItem(item:GetParent():GetID(),item:GetID())
 			if InRepairMode() and (repairCost > 0) then
-				GameTooltip:AddLine(TEXT(REPAIR_COST), "", 1, 1, 1)
+				GameTooltip:AddLine(REPAIR_COST, 1, 1, 1)
 				SetTooltipMoney(GameTooltip, repairCost)
 				GameTooltip:Show()
 			elseif MerchantFrame:IsShown() and not locked then
@@ -395,8 +546,8 @@ local function FrameUpdateLock(frame)
 end
 
 local function SUCC_search()
-	local search = CreateFrame("Frame", nil, SUCC_bag)
-	search:SetPoint("TOPLEFT", SUCC_bag, "BOTTOMLEFT", 4, 4)
+	local search = CreateFrame('Frame', nil, SUCC_bag)
+	search:SetPoint('TOPLEFT', SUCC_bag, 'BOTTOMLEFT', 4, 4)
 	search:SetHeight(29)
 	search:SetWidth(115) -- 132
 	search:SetBackdrop({
@@ -408,24 +559,24 @@ local function SUCC_search()
 	search:SetBackdropBorderColor(.5,.5,.5,1)
 	search:SetBackdropColor(unpack(SUCC_bagOptions.colors.backdrop))
 
-	search.text = search:CreateFontString(nil, "HIGH", "GameTooltipTextSmall")
+	search.text = search:CreateFontString(nil, 'HIGH', 'GameTooltipTextSmall')
 	local font, size = search.text:GetFont()
 	
-	search.edit = CreateFrame("EditBox", nil, search, "InputBoxTemplate")
+	search.edit = CreateFrame('EditBox', nil, search, 'InputBoxTemplate')
 	search.edit:SetMaxLetters(14)	
-	search.edit:SetPoint("LEFT", search, "LEFT", 10, 0)
+	search.edit:SetPoint('LEFT', search, 'LEFT', 10, 0)
 	search.edit:SetHeight(20)
 	search.edit:SetWidth(100)
-	search.edit:SetFont(font, size, "OUTLINE")
+	search.edit:SetFont(font, size, 'OUTLINE')
 	search.edit:SetAutoFocus(false)
-	search.edit:SetText("Search")
+	search.edit:SetText(SEARCH)
 	search.edit:SetTextColor(1,1,1,1)
 
-	search.button = CreateFrame("Button", nil, search.edit)
-	search.button:SetFrameStrata("LOW")	
+	search.button = CreateFrame('Button', nil, search.edit)
+	search.button:SetFrameStrata('LOW')	
 	search.button:SetWidth(25)
 	search.button:SetHeight(25)
-	search.button:SetPoint("LEFT", search.edit, "RIGHT", 0, 0)
+	search.button:SetPoint('LEFT', search.edit, 'RIGHT', 0, 0)
 	search.button:SetBackdrop({
 		bgFile = 'Interface\\AddOns\\SUCC-bag\\Textures\\marble',
 		edgeFile = 'Interface\\Tooltips\\UI-Tooltip-Border',
@@ -437,70 +588,68 @@ local function SUCC_search()
 	search.button:EnableMouse(true) 
 	search.button:Hide()
 	
-	search.icon = search.edit:CreateTexture(nil, "OVERLAY")
-	search.icon:SetPoint("CENTER", search.button, "CENTER", 1, 0)
+	search.icon = search.edit:CreateTexture(nil, 'OVERLAY')
+	search.icon:SetPoint('CENTER', search.button, 'CENTER', 1, 0)
 	search.icon:SetWidth(27)
 	search.icon:SetHeight(27)
 	search.icon:SetTexture('Interface\\Buttons\\UI-Panel-MinimizeButton-Disabled')
 	search.icon:Hide()
 
 	local function buttons(frame, a)
-		if frame:IsVisible() then
-			local name = frame:GetName()
-			for slot=1, frame.size do
-				_G[name.."Item"..slot]:SetAlpha(a)
-			end
+		if not frame:IsShown() then return end
+		local name = frame:GetName()
+		for slot=1, frame.size do
+			_G[name..'Item'..slot]:SetAlpha(a)
 		end
 	end
 
 	local function searchBag(frame)
-		if frame:IsVisible() then
-			local name = frame:GetName()
-			for slot = 1, frame.size do
-				local item = _G[name.."Item"..slot]
-				local _, itemCount = GetContainerItemInfo(item:GetParent():GetID(), item:GetID())
-				if itemCount then
-					local itemLink = GetContainerItemLink(item:GetParent():GetID(), item:GetID())
-					local itemstring = string.sub(itemLink, string.find(itemLink, "%[")+1, string.find(itemLink, "%]")-1)
-					if strfind(strlower(itemstring), strlower(string.gsub(this:GetText(), "([^%w])", "%%%1"))) then
-						item:SetAlpha(1)
-					end
+		if not frame:IsShown() then return end
+		local name = frame:GetName()
+		for slot = 1, frame.size do
+			local item = _G[name..'Item'..slot]
+			local _, itemCount = GetContainerItemInfo(item:GetParent():GetID(), item:GetID())
+			if itemCount then
+				local itemLink = GetContainerItemLink(item:GetParent():GetID(), item:GetID())
+				local itemstring = string.sub(itemLink, string.find(itemLink, "%[")+1, string.find(itemLink, "%]")-1)
+				if strfind(strlower(itemstring), strlower(string.gsub(this:GetText(), "([^%w])", "%%%1"))) then
+					item:SetAlpha(1)
 				end
 			end
 		end
 	end
 
 	local function reset()        
-		search.edit:SetText("Search")
+		search.edit:SetText(SEARCH)
 		buttons(SUCC_bag, 1)
 		buttons(SUCC_bag.bank, 1)
 		buttons(SUCC_bag.keyring, 1)
 		search.button:Hide()
 		search.icon:Hide()
-        search.edit:UnregisterEvent("BAG_UPDATE")
+        search.edit:UnregisterEvent('BAG_UPDATE')
 	end
 
-	search.edit:SetScript("OnEditFocusGained", function()
-		search.edit:SetText("")
-        search.edit:RegisterEvent("BAG_UPDATE")
+	search.edit:SetScript('OnEditFocusGained', function()
+		search.edit:SetText('')
+        search.edit:RegisterEvent('BAG_UPDATE')
 	end)
 
-	search.edit:SetScript("OnEditFocusLost", function()
+	search.edit:SetScript('OnEditFocusLost', function()
 		reset()			
 	end)
 
-	search.edit:SetScript("OnTabPressed", function()
+	search.edit:SetScript('OnTabPressed', function()
 		search.edit:ClearFocus()
 		reset()
 	end)
 
-	search.button:SetScript("OnClick", function()
+	search.button:SetScript('OnClick', function()
 		search.edit:ClearFocus()
 		reset()
 	end)	
 
-	search.edit:SetScript("OnTextChanged", function()
-		if this:GetText() == "Search" then return end
+	search.edit:SetScript('OnTextChanged', function()
+		if this:GetText() == SEARCH then return end
 		buttons(SUCC_bag, .25)
 		buttons(SUCC_bag.bank, .25)
 		buttons(SUCC_bag.keyring, .25)
@@ -515,8 +664,8 @@ local function SUCC_search()
 		end
 	end)
 
-    search.edit:SetScript("OnEvent", function()
-        if this:GetText() == "Search" then return end
+    search.edit:SetScript('OnEvent', function()
+        if this:GetText() == SEARCH then return end
 		buttons(SUCC_bag, .25)
 		buttons(SUCC_bag.bank, .25)
 		buttons(SUCC_bag.keyring, .25)
@@ -556,7 +705,7 @@ local function Essentials(frame)
 	frame:SetMovable()
 	frame:SetUserPlaced(true)
 	frame:SetClampedToScreen()
-	frame:SetPoint("CENTER", UIParent, "BOTTOMLEFT", unpack(SUCC_bagOptions.position[t] or {frame:GetCenter()}))
+	frame:SetPoint('CENTER', UIParent, 'BOTTOMLEFT', unpack(SUCC_bagOptions.position[t] or {frame:GetCenter()}))
 	frame:SetBackdrop({
 		bgFile = 'Interface\\AddOns\\SUCC-bag\\Textures\\marble',
 		edgeFile = 'Interface\\AddOns\\SUCC-bag\\Textures\\BagFrame',
@@ -580,7 +729,7 @@ local function Essentials(frame)
 	frame.title = frame:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
 	frame.title:SetPoint('TOPLEFT', frame, 11, -6)
 	frame.title.t = string.sub(t, 9, -1)
-	frame.title:SetText(frame.title.t ~= '' and frame.title.t ~= nil and frame.title.t or 'Bag')
+	frame.title:SetText(frame.title.t ~= '' and frame.title.t ~= nil and frame.title.t or BAG)
 	if frame.slotFrame then
 		SlotFrameSetup(frame)
 		frame.toggleButton = CreateFrame('Button', t .. 'ToggleButton', frame)
@@ -632,8 +781,12 @@ local function Essentials(frame)
 		end)
 		frame.lockButton:SetScript('OnEnter', function()
 			GameTooltip:SetOwner(this, 'ANCHOR_LEFT')
-			GameTooltip:AddLine('Left Click: '..(SUCC_bagOptions.position[t].locked and 'Unlock' or 'Lock')..' this frame', 1, 1, 1)
-			GameTooltip:AddLine('Right Click: Options', 0.3, 0.8, 1)
+			if SUCC_bagOptions.position[t].locked then
+				GameTooltip:AddLine(L['Left Click: Unlock this frame'], 1, 1, 1)
+			else
+				GameTooltip:AddLine(L['Left Click: Lock this frame'], 1, 1, 1)
+			end
+			GameTooltip:AddLine(L['Right Click: Options'], 0.3, 0.8, 1)
 			GameTooltip:Show()
 		end)
 		frame.lockButton:SetScript('OnLeave', function() GameTooltip:Hide() end)
@@ -664,8 +817,8 @@ local function Essentials(frame)
 			end)
 			frame.cuBag:SetScript('OnEnter', function()
 				GameTooltip:SetOwner(this, 'ANCHOR_LEFT')
-				GameTooltip:AddLine('Left Click: Sort', 1, 1, 1)
-				GameTooltip:AddLine('Right Click: Reverse order' , 0.3, 0.8, 1)
+				GameTooltip:AddLine(L['Left Click: Sort'], 1, 1, 1)
+				GameTooltip:AddLine(L['Right Click: Reverse order'], 0.3, 0.8, 1)
 				GameTooltip:Show()
 			end)
 			frame.cuBag:SetScript('OnLeave', function() GameTooltip:Hide() end)
@@ -709,7 +862,7 @@ local function BankUpdateBagSlotStatus()
 				SetItemButtonTextureVertexColor(button, 1.0,0.1,0.1)
 				local cost = GetBankSlotCost(slots)
 				SUCC_bag.bank.nextSlotCost = cost
-				button.tooltipText = BANK_BAG_PURCHASE .. '|nCost: ' .. moneyToString(cost)
+				button.tooltipText = BANK_BAG_PURCHASE
 				button:SetScript('OnClick', function()
 					this:SetChecked(not this:GetChecked())	-- slot name issue
 					PlaySound('igMainMenuOption')
@@ -741,6 +894,14 @@ local function PrepareBank(frame)
 			GameTooltip:SetOwner(this, 'ANCHOR_RIGHT')
 			if not GameTooltip:SetInventoryItem('player', this:GetInventorySlot()) then
 				GameTooltip:SetText(this.tooltipText)
+				local cost = GetBankSlotCost(GetNumBankSlots())
+				SetTooltipMoney(GameTooltip, cost)
+				if GetMoney() >= cost then
+					SetMoneyFrameColor('GameTooltipMoneyFrame', 1, 1, 1)
+				else
+					SetMoneyFrameColor('GameTooltipMoneyFrame', 1, 0.1, 0.1)
+				end
+				GameTooltip:Show()
 			end
 			CursorUpdate()
 		end)
@@ -749,13 +910,14 @@ local function PrepareBank(frame)
 				HighlightBagSlots(this:GetID())
 			end
 			GameTooltip:Hide()
+			SetMoneyFrameColor('GameTooltipMoneyFrame', 1, 1, 1)
 			ResetCursor()
 		end)
 	end
 	StaticPopupDialogs['CONFIRM_BUY_SUCCBANK_SLOT'] = {
-		text = TEXT(CONFIRM_BUY_BANK_SLOT),
-		button1 = TEXT(YES),
-		button2 = TEXT(NO),
+		text = CONFIRM_BUY_BANK_SLOT,
+		button1 = YES,
+		button2 = NO,
 		OnAccept = function()
 			PurchaseSlot()
 		end,
@@ -769,7 +931,7 @@ local function PrepareBank(frame)
 	Essentials(frame.bank)
 	frame.bank:SetScript('OnHide', function()
         for slot=1, SUCC_bag.bank.size do
-            _G[SUCC_bag.bank:GetName().."Item"..slot]:SetAlpha(1)
+            _G[SUCC_bag.bank:GetName()..'Item'..slot]:SetAlpha(1)
         end
 		CloseBankFrame()
 		PlaySound('igMainMenuClose')
@@ -813,14 +975,14 @@ local function OnEvent()
 		BankUpdateBagSlotStatus()
 	elseif event == 'ADDON_LOADED' and arg1 == 'SUCC-bag' then
 		SUCC_bagOptions = SUCC_bagOptions or SUCC_bagDefaults()
-		if SUCC_bagOptions.colors.bag['Bag'].enabled == nil then
+		if SUCC_bagOptions.colors.bag[BAG].enabled == nil then
 			SUCC_bagOptions.colors.quest.enabled = true
 			SUCC_bagOptions.colors.ammo.enabled = true
 			SUCC_bagOptions.colors.BG.enabled = true
-			SUCC_bagOptions.colors.bag['Bag'].enabled = true
-			SUCC_bagOptions.colors.bag['Soul Bag'].enabled = true
-			SUCC_bagOptions.colors.bag['Herb Bag'].enabled = true
-			SUCC_bagOptions.colors.bag['Enchanting Bag'].enabled = true
+			SUCC_bagOptions.colors.bag[BAG].enabled = true
+			SUCC_bagOptions.colors.bag[SOUL_BAG].enabled = true
+			SUCC_bagOptions.colors.bag[HERB_BAG].enabled = true
+			SUCC_bagOptions.colors.bag[ENCHANTING_BAG].enabled = true
 		end
 		this:UnregisterEvent('ADDON_LOADED')
 		BankFrame:UnregisterEvent('BANKFRAME_OPENED')
@@ -831,7 +993,7 @@ local function OnEvent()
 		this:RegisterEvent('CURSOR_UPDATE')
 		this:RegisterEvent('BANKFRAME_OPENED')
 		this:RegisterEvent('BANKFRAME_CLOSED')
-		-- this:RegisterEvent("PLAYER_ENTERING_WORLD")
+		-- this:RegisterEvent('PLAYER_ENTERING_WORLD')
 		this.bags = {0, 1, 2, 3, 4}
 		Essentials(this)
 		Essentials(this.keyring)
@@ -863,7 +1025,7 @@ SUCC_bag:SetScript('OnShow', function()
 end)
 SUCC_bag:SetScript('OnHide', function()
     for slot=1, (SUCC_bag.size or 0) do
-        _G[SUCC_bag:GetName().."Item"..slot]:SetAlpha(1)
+        _G[SUCC_bag:GetName()..'Item'..slot]:SetAlpha(1)
     end
 	PlaySound('igInventoryClose')
 end)
@@ -918,7 +1080,7 @@ SUCC_bag.keyring:SetScript('OnShow', function()
 end)
 SUCC_bag.keyring:SetScript('OnHide', function()
     for slot=1, (SUCC_bag.keyring.size or 0)do
-        _G[SUCC_bag.keyring:GetName().."Item"..slot]:SetAlpha(1)
+        _G[SUCC_bag.keyring:GetName()..'Item'..slot]:SetAlpha(1)
     end
 	PlaySound('KeyRingClose')
 end)
@@ -1022,7 +1184,7 @@ local function CreateMenuFrame()
 		end
 		button.text = button:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
 		button.text:SetPoint('Left', button)
-		button.text:SetText(text .. ':')
+		button.text:SetText(text)
 		button.swatch = button:CreateTexture(button:GetName() .. 'SwatchBg', 'BACKGROUND')
 		button.swatch:SetTexture('Interface\\ChatFrame\\ChatFrameColorSwatch')
 		button.swatch:SetPoint('RIGHT', button)
@@ -1031,7 +1193,7 @@ local function CreateMenuFrame()
 		button.swatch:SetVertexColor(unpack(color))
 		button:SetScript('OnClick', function() ColorPicker(this, color) end)
 		if hascheckbox then
-			button.enable = CreateFrame('CheckButton', name.."Enabled", button, "UICheckButtonTemplate")
+			button.enable = CreateFrame('CheckButton', name..'Enabled', button, 'UICheckButtonTemplate')
 			button.enable:SetPoint('LEFT', button, 'RIGHT', 0, 0)
 			button.enable:SetWidth(18)
 			button.enable:SetHeight(18)
@@ -1066,7 +1228,7 @@ local function CreateMenuFrame()
 		_G[name .. 'Low']:SetText(minValue)
 		_G[name .. 'High']:SetText(maxValue)
 		slider:SetScript('OnEnter', function()
-			GameTooltip:SetOwner(_G[this:GetName().."Thumb"], "ANCHOR_LEFT", 20, -5)
+			GameTooltip:SetOwner(_G[this:GetName()..'Thumb'], 'ANCHOR_LEFT', 20, -5)
 			GameTooltip:SetText(this:GetValue(), 1, 1, 1)
 			GameTooltip:Show()
 		end)
@@ -1104,19 +1266,19 @@ local function CreateMenuFrame()
 	menu.header:SetTexture('Interface\\DialogFrame\\UI-DialogBox-Header')
 	menu.header.t = menu:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
 	menu.header.t:SetPoint('TOP', menu.header, 0, -14)
-	menu.header.t:SetText('SUCC-bag options')
+	menu.header.t:SetText(L['SUCC-bag options'])
 
 	menu.bag = {}
 	menu.bank = {}
 
-	menu.bag.columns = CreateSlider('SBC_bagColumns', 'Bag Columns', 4, 32, SUCC_bagOptions.layout.columns.bag, 1)
+	menu.bag.columns = CreateSlider('SBC_bagColumns', L['Bag Columns'], 4, 32, SUCC_bagOptions.layout.columns.bag, 1)
 	menu.bag.columns:SetPoint('TOPLEFT', menu, 35, -45)
 	menu.bag.columns:SetScript('OnValueChanged', SetColumns)
 
-	menu.bank.columns = CreateSlider('SBC_bankColumns', 'Bank Columns', 4, 32, SUCC_bagOptions.layout.columns.bank, 1, menu.bag.columns)
+	menu.bank.columns = CreateSlider('SBC_bankColumns', L['Bank Columns'], 4, 32, SUCC_bagOptions.layout.columns.bank, 1, menu.bag.columns)
 	menu.bank.columns:SetScript('OnValueChanged', SetColumns)
 
-	menu.spacing = CreateSlider('SBC_itemSpacing', 'Item spacing', 0, 20, SUCC_bagOptions.layout.spacing, 1, menu.bag.columns, 1)
+	menu.spacing = CreateSlider('SBC_itemSpacing', L['Item spacing'], 0, 20, SUCC_bagOptions.layout.spacing, 1, menu.bag.columns, 1)
 	menu.spacing:SetScript('OnValueChanged', function()
 		local l, n = this:GetValue(), string.sub(this:GetName(), 1, -8)
 		SUCC_bagOptions.layout.spacing = l
@@ -1125,7 +1287,7 @@ local function CreateMenuFrame()
 		if SUCC_bag.keyring:IsVisible() then FrameLayout(SUCC_bag.keyring) end
 	end)
 
-	menu.border = CreateColorButton('SBC_borderColor', 'Border', SUCC_bagOptions.colors.border)
+	menu.border = CreateColorButton('SBC_borderColor', L['Border'], SUCC_bagOptions.colors.border)
 	menu.border:SetPoint('TOP', menu.spacing, 'BOTTOM', 0, -25)
 	menu.border.func = function(r, g, b)
 		SUCC_bagOptions.colors.border[1] = r
@@ -1138,7 +1300,7 @@ local function CreateMenuFrame()
 		SUCC_bag.bank.slotFrame:SetBackdropBorderColor(r, g, b)
 	end
 
-	menu.backdrop  = CreateColorButton('SBC_backdropColor', 'Backdrop', SUCC_bagOptions.colors.backdrop, menu.border)
+	menu.backdrop  = CreateColorButton('SBC_backdropColor', L['Backdrop'], SUCC_bagOptions.colors.backdrop, menu.border)
 	menu.backdrop.func = function(r, g, b)
 		SUCC_bagOptions.colors.backdrop[1] = r
 		SUCC_bagOptions.colors.backdrop[2] = g
@@ -1150,17 +1312,17 @@ local function CreateMenuFrame()
 		SUCC_bag.bank.slotFrame:SetBackdropColor(r, g, b)
 	end
 
-	menu.item = CreateColorButton('SBC_itemColor', 'Regular bag', SUCC_bagOptions.colors.bag.Bag, menu.border, 1)
+	menu.item = CreateColorButton('SBC_itemColor', L['Regular bag'], SUCC_bagOptions.colors.bag[BAG], menu.border, 1)
 	menu.item.func = function(r, g, b)
-		SUCC_bagOptions.colors.bag.Bag[1] = r
-		SUCC_bagOptions.colors.bag.Bag[2] = g
-		SUCC_bagOptions.colors.bag.Bag[3] = b
+		SUCC_bagOptions.colors.bag[BAG][1] = r
+		SUCC_bagOptions.colors.bag[BAG][2] = g
+		SUCC_bagOptions.colors.bag[BAG][3] = b
 		if SUCC_bag:IsVisible() then FrameUpdate(SUCC_bag) end
 		if SUCC_bag.bank:IsVisible() then FrameUpdate(SUCC_bag.bank) end
 		if SUCC_bag.keyring:IsVisible() then FrameUpdate(SUCC_bag.keyring) end
 	end
 
-	menu.quest = CreateColorButton('SBC_questColor', 'Quest item', SUCC_bagOptions.colors.quest, menu.item, nil, 1)
+	menu.quest = CreateColorButton('SBC_questColor', L['Quest item'], SUCC_bagOptions.colors.quest, menu.item, nil, 1)
 	menu.quest.func = function(r, g, b)
 		SUCC_bagOptions.colors.quest[1] = r
 		SUCC_bagOptions.colors.quest[2] = g
@@ -1169,7 +1331,7 @@ local function CreateMenuFrame()
 		if SUCC_bag.bank:IsVisible() then FrameUpdate(SUCC_bag.bank) end
 	end
 
-	menu.highlight = CreateColorButton('SBC_highlightColor', 'Highlight', SUCC_bagOptions.colors.highlight, menu.item, 1)
+	menu.highlight = CreateColorButton('SBC_highlightColor', L['Highlight'], SUCC_bagOptions.colors.highlight, menu.item, 1)
 	menu.highlight.func = function(r, g, b)
 		SUCC_bagOptions.colors.highlight[1] = r
 		SUCC_bagOptions.colors.highlight[2] = g
@@ -1178,7 +1340,7 @@ local function CreateMenuFrame()
 		if SUCC_bag.bank:IsVisible() then FrameUpdate(SUCC_bag.bank) end
 	end
 
-	menu.bg = CreateColorButton('SBC_BGColor', 'BG marks', SUCC_bagOptions.colors.BG, menu.highlight, nil, 1)
+	menu.bg = CreateColorButton('SBC_BGColor', L['BG marks'], SUCC_bagOptions.colors.BG, menu.highlight, nil, 1)
 	menu.bg.func = function(r, g, b)
 		SUCC_bagOptions.colors.BG[1] = r
 		SUCC_bagOptions.colors.BG[2] = g
@@ -1187,34 +1349,34 @@ local function CreateMenuFrame()
 		if SUCC_bag.bank:IsVisible() then FrameUpdate(SUCC_bag.bank) end
 	end
 
-	menu.soul = CreateColorButton('SBC_soulColor', 'Soul bag', SUCC_bagOptions.colors.bag['Soul Bag'], menu.highlight, 1, 1)
+	menu.soul = CreateColorButton('SBC_soulColor', L['Soul bag'], SUCC_bagOptions.colors.bag[SOUL_BAG], menu.highlight, 1, 1)
 	menu.soul.func = function(r, g, b)
-		SUCC_bagOptions.colors.bag['Soul Bag'][1] = r
-		SUCC_bagOptions.colors.bag['Soul Bag'][2] = g
-		SUCC_bagOptions.colors.bag['Soul Bag'][3] = b
+		SUCC_bagOptions.colors.bag[SOUL_BAG][1] = r
+		SUCC_bagOptions.colors.bag[SOUL_BAG][2] = g
+		SUCC_bagOptions.colors.bag[SOUL_BAG][3] = b
 		if SUCC_bag:IsVisible() then FrameUpdate(SUCC_bag) end
 		if SUCC_bag.bank:IsVisible() then FrameUpdate(SUCC_bag.bank) end
 	end
 
-	menu.herb = CreateColorButton('SBC_herbColor', 'Herb bag', SUCC_bagOptions.colors.bag['Herb Bag'], menu.soul, nil, 1)
+	menu.herb = CreateColorButton('SBC_herbColor', L['Herb bag'], SUCC_bagOptions.colors.bag[HERB_BAG], menu.soul, nil, 1)
 	menu.herb.func = function(r, g, b)
-		SUCC_bagOptions.colors.bag['Herb Bag'][1] = r
-		SUCC_bagOptions.colors.bag['Herb Bag'][2] = g
-		SUCC_bagOptions.colors.bag['Herb Bag'][3] = b
+		SUCC_bagOptions.colors.bag[HERB_BAG][1] = r
+		SUCC_bagOptions.colors.bag[HERB_BAG][2] = g
+		SUCC_bagOptions.colors.bag[HERB_BAG][3] = b
 		if SUCC_bag:IsVisible() then FrameUpdate(SUCC_bag) end
 		if SUCC_bag.bank:IsVisible() then FrameUpdate(SUCC_bag.bank) end
 	end
 
-	menu.enchanting = CreateColorButton('SBC_enchantingColor', 'Enchanting', SUCC_bagOptions.colors.bag['Enchanting Bag'], menu.soul, 1, 1)
+	menu.enchanting = CreateColorButton('SBC_enchantingColor', L['Enchanting'], SUCC_bagOptions.colors.bag[ENCHANTING_BAG], menu.soul, 1, 1)
 	menu.enchanting.func = function(r, g, b)
-		SUCC_bagOptions.colors.bag['Enchanting Bag'][1] = r
-		SUCC_bagOptions.colors.bag['Enchanting Bag'][2] = g
-		SUCC_bagOptions.colors.bag['Enchanting Bag'][3] = b
+		SUCC_bagOptions.colors.bag[ENCHANTING_BAG][1] = r
+		SUCC_bagOptions.colors.bag[ENCHANTING_BAG][2] = g
+		SUCC_bagOptions.colors.bag[ENCHANTING_BAG][3] = b
 		if SUCC_bag:IsVisible() then FrameUpdate(SUCC_bag) end
 		if SUCC_bag.bank:IsVisible() then FrameUpdate(SUCC_bag.bank) end
 	end
 
-	menu.ammo = CreateColorButton('SBC_ammoColor', 'Ammo bag', SUCC_bagOptions.colors.ammo, menu.enchanting, nil, 1)
+	menu.ammo = CreateColorButton('SBC_ammoColor', L['Ammo bag'], SUCC_bagOptions.colors.ammo, menu.enchanting, nil, 1)
 	menu.ammo.func = function(r, g, b)
 		SUCC_bagOptions.colors.ammo[1] = r
 		SUCC_bagOptions.colors.ammo[2] = g
@@ -1240,7 +1402,7 @@ local function CreateMenuFrame()
 	menu.override.t = menu.override:CreateFontString(nil, 'OVERLAY', 'GameFontNormal')
 	menu.override.t:SetPoint('RIGHT', menu.override, 'LEFT', 10, 0)
 	menu.override.t:SetWidth(200)
-	menu.override.t:SetText('Quality color above bag color:')
+	menu.override.t:SetText(L['Quality color above bag color'])
 
 	if isSortingAddonLoaded() then
 		menu.cleanup = CreateFrame('CheckButton', 'SBC_cleanUp', menu, 'UICheckButtonTemplate')
@@ -1260,12 +1422,12 @@ local function CreateMenuFrame()
 		menu.cleanup.t = menu.cleanup:CreateFontString(nil, 'OVERLAY', 'GameFontNormal')
 		menu.cleanup.t:SetPoint('RIGHT', menu.cleanup, 'LEFT', 10, 0)
 		menu.cleanup.t:SetWidth(90)
-		menu.cleanup.t:SetText('Clean_Up:')
+		menu.cleanup.t:SetText(L['Sort button'])
 	end
 
 	menu.reset = CreateFrame('Button', nil, menu, 'UIPanelButtonTemplate')
 	menu.reset:SetWidth(100) menu.reset:SetHeight(25)
-	menu.reset:SetText('Reset')
+	menu.reset:SetText(RESET)
 	menu.reset:SetPoint('BOTTOMLEFT', menu, 25, 20)
 	menu.reset:SetScript('OnClick', function()
 		SUCC_bagOptions = SUCC_bagDefaults()
@@ -1281,7 +1443,7 @@ local function CreateMenuFrame()
 
 	menu.close = CreateFrame('Button', nil, menu, 'UIPanelButtonTemplate')
 	menu.close:SetWidth(100) menu.close:SetHeight(25)
-	menu.close:SetText('Close')
+	menu.close:SetText(CLOSE)
 	menu.close:SetPoint('BOTTOMRIGHT', menu, -25, 20)
 	menu.close:SetScript('OnClick', function() menu:Hide() end)
 end
