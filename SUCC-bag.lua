@@ -985,6 +985,7 @@ local function OnEvent()
 		BankUpdateBagSlotStatus()
 	elseif event == 'ADDON_LOADED' and arg1 == 'SUCC-bag' then
 		SUCC_bagOptions = SUCC_bagOptions or SUCC_bagDefaults()
+		if not SUCC_bagOptions.colors.bag[BAG] then SUCC_bagDefaults() end
 		if SUCC_bagOptions.colors.bag[BAG].enabled == nil then
 			SUCC_bagOptions.colors.quest.enabled = true
 			SUCC_bagOptions.colors.ammo.enabled = true
