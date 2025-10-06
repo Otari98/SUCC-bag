@@ -562,7 +562,7 @@ local function SUCC_search()
 	search.text = search:CreateFontString(nil, 'HIGH', 'GameTooltipTextSmall')
 	local font, size = search.text:GetFont()
 	
-	search.edit = CreateFrame('EditBox', nil, search, 'InputBoxTemplate')
+	search.edit = CreateFrame('EditBox', 'SUCC_bagSearchString', search, 'InputBoxTemplate')
 	search.edit:SetMaxLetters(14)	
 	search.edit:SetPoint('LEFT', search, 'LEFT', 10, 0)
 	search.edit:SetHeight(20)
@@ -612,7 +612,7 @@ local function SUCC_search()
 			if itemCount then
 				local itemLink = GetContainerItemLink(item:GetParent():GetID(), item:GetID())
 				local itemstring = string.sub(itemLink, string.find(itemLink, "%[")+1, string.find(itemLink, "%]")-1)
-				if strfind(strlower(itemstring), strlower(string.gsub(this:GetText(), "([^%w])", "%%%1"))) then
+				if strfind(strlower(itemstring), strlower(string.gsub(search.edit:GetText(), "([^%w])", "%%%1"))) then
 					item:SetAlpha(1)
 				end
 			end
@@ -681,6 +681,12 @@ local function SUCC_search()
 			search.icon:Show()
 		end
     end)
+
+	SUCC_bag.bank:SetScript('OnShow', function()
+		if search.edit:GetText() == SEARCH then return end
+		buttons(SUCC_bag.bank, .25)
+		searchBag(SUCC_bag.bank)
+	end)
 end
 
 local function Essentials(frame)
