@@ -627,11 +627,13 @@ local function SUCC_search()
 		search.button:Hide()
 		search.icon:Hide()
         search.edit:UnregisterEvent('BAG_UPDATE')
+		search.edit:UnregisterEvent('PLAYERBANKSLOTS_CHANGED')
 	end
 
 	search.edit:SetScript('OnEditFocusGained', function()
 		search.edit:SetText('')
         search.edit:RegisterEvent('BAG_UPDATE')
+		search.edit:RegisterEvent('PLAYERBANKSLOTS_CHANGED')
 	end)
 
 	search.edit:SetScript('OnEditFocusLost', function()
