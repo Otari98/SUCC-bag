@@ -22,12 +22,12 @@ end
 local function SUCC_bagDefaults()
 	SUCC_bagOptions = {}
 	SUCC_bagOptions.colors = {}
+	SUCC_bagOptions.colors.border = {1, 1, 1}
+	SUCC_bagOptions.colors.backdrop = {0.3, 0.3, 0.3}
 	SUCC_bagOptions.colors.highlight = {1, 0.2, 0.2}
 	SUCC_bagOptions.colors.quest = {0.96, 0.64, 0.94, enabled = true}
 	SUCC_bagOptions.colors.ammo = {0.8, 0.8, 0.3, enabled = true}
 	SUCC_bagOptions.colors.BG = {0.98, 0.95, 0, enabled = true}
-	SUCC_bagOptions.colors.border = {1, 1, 1}
-	SUCC_bagOptions.colors.backdrop = {0.3, 0.3, 0.3}
 	SUCC_bagOptions.colors.bag = {}
 	SUCC_bagOptions.colors.bag['Bag'] = {0.3, 0.3, 0.3}
 	SUCC_bagOptions.colors.bag['Soul Bag'] = {0.678, 0.549, 1, enabled = true}
@@ -78,11 +78,11 @@ local function FrameTrimToSize(frame)
 		width = 256
 	else
 		local slot = frame.size + 1
-		local button = getglobal(frameName .. 'Item'.. slot)
+		local button = _G[frameName .. 'Item'.. slot]
 		while button do
 			button:Hide()
 			slot = slot + 1
-			button = getglobal(frameName .. 'Item'.. slot)
+			button = _G[frameName .. 'Item'.. slot]
 		end
 		if frame.size < frame.cols then
 			width = (37 + frame.space) * frame.size + 14 - frame.space
@@ -140,7 +140,7 @@ local function FrameLayout(frame, cols)
 	local space = SUCC_bagOptions.layout.spacing or 4
 	frame.space = space
 	local rows = math.ceil(frame.size / cols)
-	local button = getglobal(frameName .. 'Item1')
+	local button = _G[frameName .. 'Item1']
 	if button then
 		local index = 1
 		button:ClearAllPoints()
@@ -148,12 +148,12 @@ local function FrameLayout(frame, cols)
 		for i = 1, rows, 1 do
 			for j = 1, cols, 1 do
 				index = index + 1
-				button = getglobal(frameName .. 'Item' .. index)
+				button = _G[frameName .. 'Item' .. index]
 				if not button then break end
 				button:ClearAllPoints()
 				button:SetPoint('LEFT', frameName .. 'Item' .. index - 1, 'RIGHT', space, 0)
 			end
-			button = getglobal(frameName .. 'Item' .. index)
+			button = _G[frameName .. 'Item' .. index]
 			if not button then break end
 			button:ClearAllPoints()
 			button:SetPoint('TOP', frameName .. 'Item' .. index - cols, 'BOTTOM', 0, -space)
@@ -234,7 +234,7 @@ local function ItemUpdateBorder(button, option)
 end
 
 local function HighlightBagSlots(bagID, option)
-	local frame = getglobal('SUCC_bagDummyBag' .. bagID)
+	local frame = _G['SUCC_bagDummyBag' .. bagID]
 	if frame then
 		local items = {frame:GetChildren()}
 		if option then frame.colorLocked = 1 else  frame.colorLocked = nil end
@@ -252,7 +252,7 @@ local function ItemUpdate(item)
 		ContainerFrame_UpdateCooldown(item:GetParent():GetID() , item)
 		item.hasItem = 1
 	else
-		getglobal(item:GetName() .. 'Cooldown'):Hide()
+		_G[item:GetName() .. 'Cooldown']:Hide()
 		item.hasItem = nil
 	end
 	SetItemButtonDesaturated(item, locked, 0.5, 0.5, 0.5)
@@ -262,11 +262,11 @@ local function ItemUpdate(item)
 	if GameTooltip:IsOwned(item) then
 		if texture then
 			local hasCooldown, repairCost = GameTooltip:SetBagItem(item:GetParent():GetID(),item:GetID())
-			if ( InRepairMode() and (repairCost > 0) ) then
+			if InRepairMode() and (repairCost > 0) then
 				GameTooltip:AddLine(TEXT(REPAIR_COST), "", 1, 1, 1)
 				SetTooltipMoney(GameTooltip, repairCost)
 				GameTooltip:Show()
-			elseif ( MerchantFrame:IsShown() and not locked) then
+			elseif MerchantFrame:IsShown() and not locked then
 				showSell = 1
 			end
 		else
@@ -315,7 +315,7 @@ local function AddBag(frame, bagID)
 	local frameName = frame:GetName()
 	local slot = frame.size
 	local bagSize
-	if(bagID == KEYRING_CONTAINER) then
+	if bagID == KEYRING_CONTAINER then
 		bagSize = GetKeyRingSize()
 	else
 		bagSize = GetContainerNumSlots(bagID)
@@ -323,7 +323,7 @@ local function AddBag(frame, bagID)
 	dummyBag[bagID].size = bagSize
 	for index = 1, bagSize, 1 do
 		slot = slot + 1
-		local item = getglobal( frameName .. 'Item'.. slot) or ItemCreate(frameName .. 'Item'.. slot, dummyBag[bagID])
+		local item = _G[frameName .. 'Item'.. slot] or ItemCreate(frameName .. 'Item'.. slot, dummyBag[bagID])
 		item:SetID(index)
 		item:SetParent(dummyBag[bagID])
 		item:Show()
@@ -377,7 +377,7 @@ local function FrameUpdate(frame, bagID)
 		end
 	end
 	for slot = startSlot, endSlot do
-		local item = getglobal(frameName .. 'Item' .. slot)
+		local item = _G[frameName .. 'Item' .. slot]
 		if item then
 			ItemUpdate(item)
 		end
@@ -388,7 +388,7 @@ local function FrameUpdateLock(frame)
 	if not frame.size then return end
 	local frameName = frame:GetName()
 	for slot = 1, frame.size do
-		local item = getglobal(frameName .. 'Item' .. slot)
+		local item = _G[frameName .. 'Item' .. slot]
 		local _, _, locked = GetContainerItemInfo(item:GetParent():GetID(), item:GetID())
 		SetItemButtonDesaturated(item, locked, 0.5, 0.5, 0.5)
 	end
@@ -448,7 +448,7 @@ local function SUCC_search()
 		if frame:IsVisible() then
 			local name = frame:GetName()
 			for slot=1, frame.size do
-				getglobal(name.."Item"..slot):SetAlpha(a)
+				_G[name.."Item"..slot]:SetAlpha(a)
 			end
 		end
 	end
@@ -457,7 +457,7 @@ local function SUCC_search()
 		if frame:IsVisible() then
 			local name = frame:GetName()
 			for slot = 1, frame.size do
-				local item = getglobal(name.."Item"..slot)
+				local item = _G[name.."Item"..slot]
 				local _, itemCount = GetContainerItemInfo(item:GetParent():GetID(), item:GetID())
 				if itemCount then
 					local itemLink = GetContainerItemLink(item:GetParent():GetID(), item:GetID())
@@ -681,15 +681,15 @@ end
 local function BankUpdateBagSlotStatus()
 	local slots, full = GetNumBankSlots()
 	for i=1, NUM_BANKBAGSLOTS, 1 do
-		local button = getglobal('SUCC_bagBBag'..i)
+		local button = _G['SUCC_bagBBag'..i]
 		local tooltipText
 		if button then
-			if ( i <= slots ) then
+			if i <= slots then
 				SetItemButtonTextureVertexColor(button, 1.0,1.0,1.0)
 				button.tooltipText = BANK_BAG
 				button:SetScript('OnClick', function()
 					if not CursorHasItem() then
-						if ( IsShiftKeyDown() ) then
+						if IsShiftKeyDown() then
 							PickupBagFromSlot(this:GetInventorySlot())
 							this:SetChecked(not this:GetChecked())	-- slot name issue
 						else
@@ -739,8 +739,8 @@ local function PrepareBank(frame)
 		frame.bank.slotFrame.slot[i]:SetScript('OnEnter', function()
 			HighlightBagSlots(this:GetID(), 'highlight')
 			GameTooltip:SetOwner(this, 'ANCHOR_RIGHT')
-			if ( not GameTooltip:SetInventoryItem('player', this:GetInventorySlot()) ) then
-					GameTooltip:SetText(this.tooltipText)
+			if not GameTooltip:SetInventoryItem('player', this:GetInventorySlot()) then
+				GameTooltip:SetText(this.tooltipText)
 			end
 			CursorUpdate()
 		end)
@@ -769,7 +769,7 @@ local function PrepareBank(frame)
 	Essentials(frame.bank)
 	frame.bank:SetScript('OnHide', function()
         for slot=1, SUCC_bag.bank.size do
-            getglobal(SUCC_bag.bank:GetName().."Item"..slot):SetAlpha(1)
+            _G[SUCC_bag.bank:GetName().."Item"..slot]:SetAlpha(1)
         end
 		CloseBankFrame()
 		PlaySound('igMainMenuClose')
@@ -809,7 +809,7 @@ local function OnEvent()
 		SBFrameClose(SUCC_bag.bank)
 	elseif event == 'PLAYERBANKSLOTS_CHANGED' then
 		FrameUpdate(SUCC_bag.bank, -1)
-	elseif ( event == 'PLAYER_MONEY' or event == 'PLAYERBANKBAGSLOTS_CHANGED' ) then
+	elseif event == 'PLAYER_MONEY' or event == 'PLAYERBANKBAGSLOTS_CHANGED' then
 		BankUpdateBagSlotStatus()
 	elseif event == 'ADDON_LOADED' and arg1 == 'SUCC-bag' then
 		SUCC_bagOptions = SUCC_bagOptions or SUCC_bagDefaults()
@@ -863,7 +863,7 @@ SUCC_bag:SetScript('OnShow', function()
 end)
 SUCC_bag:SetScript('OnHide', function()
     for slot=1, (SUCC_bag.size or 0) do
-        getglobal(SUCC_bag:GetName().."Item"..slot):SetAlpha(1)
+        _G[SUCC_bag:GetName().."Item"..slot]:SetAlpha(1)
     end
 	PlaySound('igInventoryClose')
 end)
@@ -875,7 +875,7 @@ for i = 1, NUM_BAG_SLOTS, 1 do
 	SUCC_bag.slotFrame.slot[i]:SetScript('OnClick', function()
 		local bagID = this:GetID()
 		if not CursorHasItem() then
-			if ( IsShiftKeyDown() ) then
+			if IsShiftKeyDown() then
 				BagSlotButton_OnDrag()
 			else
 				PlaySound('igMainMenuOptionFaerTab')
@@ -918,7 +918,7 @@ SUCC_bag.keyring:SetScript('OnShow', function()
 end)
 SUCC_bag.keyring:SetScript('OnHide', function()
     for slot=1, (SUCC_bag.keyring.size or 0)do
-        getglobal(SUCC_bag.keyring:GetName().."Item"..slot):SetAlpha(1)
+        _G[SUCC_bag.keyring:GetName().."Item"..slot]:SetAlpha(1)
     end
 	PlaySound('KeyRingClose')
 end)
@@ -953,10 +953,10 @@ local menu
 
 local function SlidersState(frame, disable)
 	local frameName = frame:GetName()
-	local thumb = getglobal(frameName .. 'Thumb')
-	local string = getglobal(frameName .. 'Text')
-	local low = getglobal(frameName .. 'Low')
-	local high = getglobal(frameName .. 'High')
+	local thumb = _G[frameName .. 'Thumb']
+	local string = _G[frameName .. 'Text']
+	local low = _G[frameName .. 'Low']
+	local high = _G[frameName .. 'High']
 	if disable == 1 then
 		thumb:Hide()
 		string:SetVertexColor(GRAY_FONT_COLOR.r, GRAY_FONT_COLOR.g, GRAY_FONT_COLOR.b)
@@ -981,6 +981,7 @@ local function SetColumns()
 	else
 		FrameLayout(SUCC_bag.bank, l)
 	end
+	this:GetScript('OnEnter')()
 end
 
 local function SetColor()
@@ -1064,6 +1065,14 @@ local function CreateMenuFrame()
 		_G[name .. 'Text']:SetText(text)
 		_G[name .. 'Low']:SetText(minValue)
 		_G[name .. 'High']:SetText(maxValue)
+		slider:SetScript('OnEnter', function()
+			GameTooltip:SetOwner(_G[this:GetName().."Thumb"], "ANCHOR_LEFT", 20, -5)
+			GameTooltip:SetText(this:GetValue(), 1, 1, 1)
+			GameTooltip:Show()
+		end)
+		slider:SetScript('OnLeave', function()
+			GameTooltip:Hide()
+		end)
 		return slider
 	end
 
