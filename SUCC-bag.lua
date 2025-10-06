@@ -41,16 +41,16 @@ local function SUCC_bagDefaults()
 	SUCC_bagOptions.layout.columns.bank = 11
 	SUCC_bagOptions.Clean_Up = 1
 	SUCC_bagOptions.position = {}
-	SUCC_bagOptions.position["SUCC_bag"] = {1000.0, 380.0}
-	SUCC_bagOptions.position["SUCC_bagBank"] = {640.0, 440.0}
-	SUCC_bagOptions.position["SUCC_bagKeyring"] = {760.0, 740.0}
+	SUCC_bagOptions.position["SUCC_bag"] = {1000.0, 380.0, locked = false}
+	SUCC_bagOptions.position["SUCC_bagBank"] = {640.0, 440.0, locked = false}
+	SUCC_bagOptions.position["SUCC_bagKeyring"] = {760.0, 740.0, locked = false}
 	return SUCC_bagOptions
 end
 
 -- debug
--- local function print(mes)
--- 	DEFAULT_CHAT_FRAME:AddMessage(mes)
--- end
+local print = print or function(mes)
+	DEFAULT_CHAT_FRAME:AddMessage(mes)
+end
 
 local function	moneyToString(money)
 	local coins = {}
@@ -100,12 +100,12 @@ local function TitleLayout(frame)
 	if frame.cuBag and SUCC_bagOptions.Clean_Up == 1 then
 		frame.title:ClearAllPoints()
 		frame.title:SetPoint('LEFT', frame.cuBag, 'RIGHT', 3, 0)
-		frame.cuBag:SetPoint('LEFT', frame.toggleButton, 'RIGHT', 3, 0)
+		frame.cuBag:SetPoint('LEFT', frame.lockButton, 'RIGHT', 3, 0)
 		if not frame.cuBag:IsVisible() then frame.cuBag:Show() end
 	else
 		if frame.cuBag then frame.cuBag:Hide() end
 		frame.title:ClearAllPoints()
-		frame.title:SetPoint('LEFT', frame.toggleButton, 'RIGHT', 3, 0)
+		frame.title:SetPoint('LEFT', frame.lockButton, 'RIGHT', 3, 0)
 	end
 end
 
@@ -540,10 +540,16 @@ local function Essentials(frame)
 	if not SUCC_bagOptions.position[t] then
 		SUCC_bagOptions.position[t] = {frame:GetCenter()}
 	end
-	frame:SetScript('OnMouseDown', function() this:StartMoving() end)
+	frame:SetScript('OnMouseDown', function()
+		if not SUCC_bagOptions.position[t].locked then
+			this:StartMoving()
+		end
+	end)
 	frame:SetScript('OnMouseUp', function()
-		this:StopMovingOrSizing()
-		SUCC_bagOptions.position[t] = {frame:GetCenter()}
+		if not SUCC_bagOptions.position[t].locked then
+			this:StopMovingOrSizing()
+			SUCC_bagOptions.position[t] = {frame:GetCenter()}
+		end
 	end)
 	frame:SetToplevel()
 	frame:EnableMouse()
@@ -606,6 +612,42 @@ local function Essentials(frame)
 			GameTooltip:Show()
 		end)
 		frame.toggleButton:SetScript('OnLeave', function() GameTooltip:Hide() end)
+
+		frame.lockButton = CreateFrame('Button', t .. 'LockButton', frame)
+		frame.lockButton:SetHeight(12)
+		frame.lockButton:SetWidth(12)
+		frame.lockButton:SetPoint('LEFT', frame.toggleButton, 'RIGHT', 3, 0)
+		frame.lockButton:SetNormalTexture('Interface\\QuestFrame\\UI-Quest-BulletPoint')
+		frame.lockButton:SetHighlightTexture('Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight')
+		frame.lockButton:SetPushedTexture('Interface\\QuestFrame\\UI-Quest-BulletPoint')
+		frame.lockButton:GetNormalTexture():SetTexCoord(0.25, 0.75, 0.25, 0.75)
+		frame.lockButton:GetNormalTexture():SetVertexColor(1, 0.8, 0.5)
+		frame.lockButton:RegisterForClicks('LeftButtonUp', 'RightButtonUp')
+		frame.lockButton:SetScript('OnShow', function()
+			if SUCC_bagOptions.position[t].locked then
+				frame.lockButton:GetNormalTexture():SetVertexColor(1, 0.8, 0.5, 1)
+			else
+				frame.lockButton:GetNormalTexture():SetVertexColor(1, 0.8, 0.5, 0.5)
+			end
+		end)
+		frame.lockButton:SetScript('OnEnter', function()
+			GameTooltip:SetOwner(this, 'ANCHOR_LEFT')
+			GameTooltip:AddLine('Left Click: '..(SUCC_bagOptions.position[t].locked and 'Unlock' or 'Lock')..' this frame', 1, 1, 1)
+			GameTooltip:AddLine('Right Click: Options', 0.3, 0.8, 1)
+			GameTooltip:Show()
+		end)
+		frame.lockButton:SetScript('OnLeave', function() GameTooltip:Hide() end)
+		frame.lockButton:SetScript('OnClick', function()
+			if arg1 == 'RightButton' then
+				SlashCmdList['SUCC_BAG']()
+			else
+				SUCC_bagOptions.position[t].locked = not SUCC_bagOptions.position[t].locked
+				this:GetScript('OnShow')()
+				this:GetScript('OnEnter')()
+				PlaySound('igMainMenuOption')
+			end
+		end)
+
 		if isSortingAddonLoaded() then
 			frame.cuBag = CreateFrame('Button', t .. 'CU_button', frame)
 			frame.cuBag:SetHeight(12)
@@ -933,7 +975,12 @@ end
 local function SetColumns()
 	local l, n = this:GetValue(), string.sub(this:GetName(), 5, -8)
 	SUCC_bagOptions.layout.columns[n] = l
-	if n == 'bag' then FrameLayout(SUCC_bag, l) else FrameLayout(SUCC_bag.bank, l) end
+	if n == 'bag' then
+		FrameLayout(SUCC_bag, l)
+		FrameLayout(SUCC_bag.keyring, l)
+	else
+		FrameLayout(SUCC_bag.bank, l)
+	end
 end
 
 local function SetColor()
