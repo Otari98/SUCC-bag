@@ -1294,6 +1294,7 @@ local function CreateMenuFrame()
 	menu.spacing:SetScript('OnValueChanged', function()
 		local l, n = this:GetValue(), string.sub(this:GetName(), 1, -8)
 		SUCC_bagOptions.layout.spacing = l
+		this:GetScript('OnEnter')()
 		if SUCC_bag:IsShown() then FrameLayout(SUCC_bag) end
 		if SUCC_bag.bank:IsShown() then FrameLayout(SUCC_bag.bank) end
 		if SUCC_bag.keyring:IsShown() then FrameLayout(SUCC_bag.keyring) end
