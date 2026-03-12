@@ -550,7 +550,7 @@ local function SUCC_search()
 	local search = CreateFrame('Frame', nil, SUCC_bag)
 	search:SetPoint('TOPLEFT', SUCC_bag, 'BOTTOMLEFT', 4, 4)
 	search:SetHeight(29)
-	search:SetWidth(115) -- 132
+	search:SetWidth(132)
 	search:SetBackdrop({
 		bgFile = 'Interface\\AddOns\\SUCC-bag\\Textures\\marble',
 		edgeFile = 'Interface\\Tooltips\\UI-Tooltip-Border',
@@ -559,42 +559,25 @@ local function SUCC_search()
 	})
 	search:SetBackdropBorderColor(.5,.5,.5,1)
 	search:SetBackdropColor(unpack(SUCC_bagOptions.colors.backdrop))
+	search:SetScale(0.9)
 
-	search.text = search:CreateFontString(nil, 'HIGH', 'GameTooltipTextSmall')
+	search.text = search:CreateFontString(nil, 'HIGH', 'ChatFontNormal')
 	local font, size = search.text:GetFont()
 	
-	search.edit = CreateFrame('EditBox', 'SUCC_bagSearchString', search, 'InputBoxTemplate')
+	search.edit = CreateFrame('EditBox', 'SUCC_bagSearchString', search)
 	search.edit:SetMaxLetters(14)	
 	search.edit:SetPoint('LEFT', search, 'LEFT', 10, 0)
 	search.edit:SetHeight(20)
-	search.edit:SetWidth(100)
+	search.edit:SetWidth(115)
 	search.edit:SetFont(font, size, 'OUTLINE')
 	search.edit:SetAutoFocus(false)
 	search.edit:SetText(SEARCH)
-	search.edit:SetTextColor(1,1,1,1)
+	search.edit:SetTextInsets(0, 20, 0, 0)
 
-	search.button = CreateFrame('Button', nil, search.edit)
-	search.button:SetFrameStrata('LOW')	
+	search.button = CreateFrame('Button', nil, search.edit, 'UIPanelCloseButton')
 	search.button:SetWidth(25)
 	search.button:SetHeight(25)
-	search.button:SetPoint('LEFT', search.edit, 'RIGHT', 0, 0)
-	search.button:SetBackdrop({
-		bgFile = 'Interface\\AddOns\\SUCC-bag\\Textures\\marble',
-		edgeFile = 'Interface\\Tooltips\\UI-Tooltip-Border',
-		tile = true, tileSize = 8, edgeSize = 16,
-		insets = { left = 3, right = 3, top = 3, bottom = 3 }
-	})
-	search.button:SetBackdropBorderColor(.5,.5,.5,1)
-	search.button:SetBackdropColor(unpack(SUCC_bagOptions.colors.backdrop))
-	search.button:EnableMouse(true) 
-	search.button:Hide()
-	
-	search.icon = search.edit:CreateTexture(nil, 'OVERLAY')
-	search.icon:SetPoint('CENTER', search.button, 'CENTER', 1, 0)
-	search.icon:SetWidth(27)
-	search.icon:SetHeight(27)
-	search.icon:SetTexture('Interface\\Buttons\\UI-Panel-MinimizeButton-Disabled')
-	search.icon:Hide()
+	search.button:SetPoint('RIGHT', search, 'RIGHT', -2, 0)
 
 	local function buttons(frame, a)
 		if not frame:IsShown() then return end
@@ -609,27 +592,20 @@ local function SUCC_search()
 		local name = frame:GetName()
 		for slot = 1, frame.size do
 			local item = _G[name..'Item'..slot]
-			local _, itemCount = GetContainerItemInfo(item:GetParent():GetID(), item:GetID())
-			if itemCount then
-				local itemLink = GetContainerItemLink(item:GetParent():GetID(), item:GetID())
-				local itemstring = string.sub(itemLink, string.find(itemLink, "%[")+1, string.find(itemLink, "%]")-1)
-				if strfind(strlower(itemstring), strlower(string.gsub(search.edit:GetText(), "([^%w])", "%%%1"))) then
+			local itemLink = GetContainerItemLink(item:GetParent():GetID(), item:GetID())
+			if itemLink then
+				local query = search.edit:GetText()
+				local _, _, itemName = strfind(itemLink, "|h%[(.+)%]|h")
+				if itemName and strfind(strlower(itemName), strlower(query), 1, true) then
 					item:SetAlpha(1)
 				end
 			end
 		end
 	end
 
-	local function reset()        
-		search.edit:SetText(SEARCH)
-		buttons(SUCC_bag, 1)
-		buttons(SUCC_bag.bank, 1)
-		buttons(SUCC_bag.keyring, 1)
-		search.button:Hide()
-		search.icon:Hide()
-        search.edit:UnregisterEvent('BAG_UPDATE')
-		search.edit:UnregisterEvent('PLAYERBANKSLOTS_CHANGED')
-	end
+	search.edit:SetScript('OnEscapePressed', function()
+		search.edit:ClearFocus()
+	end)
 
 	search.edit:SetScript('OnEditFocusGained', function()
 		search.edit:SetText('')
@@ -638,21 +614,24 @@ local function SUCC_search()
 	end)
 
 	search.edit:SetScript('OnEditFocusLost', function()
-		reset()			
+		search.edit:SetText(SEARCH)
+		buttons(SUCC_bag, 1)
+		buttons(SUCC_bag.bank, 1)
+		buttons(SUCC_bag.keyring, 1)
+        search.edit:UnregisterEvent('BAG_UPDATE')
+		search.edit:UnregisterEvent('PLAYERBANKSLOTS_CHANGED')
 	end)
 
 	search.edit:SetScript('OnTabPressed', function()
 		search.edit:ClearFocus()
-		reset()
 	end)
 
 	search.button:SetScript('OnClick', function()
 		search.edit:ClearFocus()
-		reset()
 	end)	
 
 	search.edit:SetScript('OnTextChanged', function()
-		if this:GetText() == SEARCH then return end
+		if search.edit:GetText() == SEARCH then return end
 		buttons(SUCC_bag, .25)
 		buttons(SUCC_bag.bank, .25)
 		buttons(SUCC_bag.keyring, .25)
@@ -660,15 +639,10 @@ local function SUCC_search()
 		searchBag(SUCC_bag)
 		searchBag(SUCC_bag.bank)
 		searchBag(SUCC_bag.keyring)
-
-		if not search.button:IsShown() then
-			search.button:Show()
-			search.icon:Show()
-		end
 	end)
 
     search.edit:SetScript('OnEvent', function()
-        if this:GetText() == SEARCH then return end
+        if search.edit:GetText() == SEARCH then return end
 		buttons(SUCC_bag, .25)
 		buttons(SUCC_bag.bank, .25)
 		buttons(SUCC_bag.keyring, .25)
@@ -676,11 +650,6 @@ local function SUCC_search()
 		searchBag(SUCC_bag)
 		searchBag(SUCC_bag.bank)
 		searchBag(SUCC_bag.keyring)
-
-		if not search.button:IsShown() then
-			search.button:Show()
-			search.icon:Show()
-		end
     end)
 
 	SUCC_bag.bank:SetScript('OnShow', function()
@@ -1213,10 +1182,10 @@ local function CreateMenuFrame()
 			button.enable:SetScript('OnClick', function()
 				color.enabled = not color.enabled
 				this:SetChecked(color.enabled)
-				PlayClickSound()
 				if SUCC_bag:IsShown() then FrameUpdate(SUCC_bag) end
 				if SUCC_bag.bank:IsShown() then FrameUpdate(SUCC_bag.bank) end
 				if SUCC_bag.keyring:IsShown() then FrameUpdate(SUCC_bag.keyring) end
+				PlaySound('igMainMenuOptionCheckBoxOn')
 			end)
 		end
 		return button
@@ -1411,6 +1380,7 @@ local function CreateMenuFrame()
 		end
 		if SUCC_bag:IsShown() then FrameUpdate(SUCC_bag) end
 		if SUCC_bag.bank:IsShown() then FrameUpdate(SUCC_bag.bank) end
+		PlaySound('igMainMenuOptionCheckBoxOn')
 	end)
 	menu.override.t = menu.override:CreateFontString(nil, 'OVERLAY', 'GameFontNormal')
 	menu.override.t:SetPoint('RIGHT', menu.override, 'LEFT', 10, 0)
@@ -1431,6 +1401,7 @@ local function CreateMenuFrame()
 			end
 			TitleLayout(SUCC_bag)
 			TitleLayout(SUCC_bag.bank)
+			PlaySound('igMainMenuOptionCheckBoxOn')
 		end)
 		menu.cleanup.t = menu.cleanup:CreateFontString(nil, 'OVERLAY', 'GameFontNormal')
 		menu.cleanup.t:SetPoint('RIGHT', menu.cleanup, 'LEFT', 10, 0)
@@ -1452,13 +1423,17 @@ local function CreateMenuFrame()
 		if SUCC_bag:IsShown() then FrameGenerate(SUCC_bag) end
 		if SUCC_bag.bank:IsShown() then FrameGenerate(SUCC_bag.bank) end
 		if SUCC_bag.keyring:IsShown() then FrameGenerate(SUCC_bag.keyring) end
+		PlaySound('igMainMenuOptionCheckBoxOn')
 	end)
 
 	menu.close = CreateFrame('Button', nil, menu, 'UIPanelButtonTemplate')
 	menu.close:SetWidth(100) menu.close:SetHeight(25)
 	menu.close:SetText(CLOSE)
 	menu.close:SetPoint('BOTTOMRIGHT', menu, -25, 20)
-	menu.close:SetScript('OnClick', function() menu:Hide() end)
+	menu.close:SetScript('OnClick', function()
+		menu:Hide()
+		PlaySound('igMainMenuOptionCheckBoxOn')
+	end)
 end
 
 SlashCmdList['SUCC_BAG'] = function()

@@ -1,5 +1,5 @@
 ## Interface: 11200
-## Version: 1.6
+## Version: 1.7
 ## Author: checkem
 ## Title: SUCC-bag
 ## Notes: Why sip if you can |cFFF6A3EFS U C C|cFFFFFFFF?|n(Yes! A bag addon.)
